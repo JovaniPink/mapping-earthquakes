@@ -84,135 +84,129 @@
     <link rel="stylesheet" href="/static/css/style.css" /> -->
   </head>
 
-  <body>
-    <main>
-      <section>
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col d-flex justify-content-center">
-              <div id="mapid"></div>
-              <!-- The div that holds our map -->
-            </div>
-          </div>
-          <!-- / .row-->
+  <body id="page-top">
+    <!-- Navigation-->
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
+      id="sideNav"
+    >
+      <a class="navbar-brand js-scroll-trigger" href="#page-top">
+        <span class="d-block d-lg-none">MAPPING EARTHQUAKES</span>
+        <span class="d-none d-lg-block"
+          ><img
+            class="img-fluid img-profile rounded-circle mx-auto mb-2"
+            src="static/images/earthquake.png"
+            alt=""
+        /></span>
+      </a>
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbarSupportedContent"
+        aria-controls="navbarSupportedContent"
+        aria-expanded="false"
+        aria-label="Toggle navigation"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#single-mapping"
+              >Single Mapping</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#multi-mapping"
+              >Multi Mapping</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#alt-mapping-3"
+              >Alt Mapping 3</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#alt-mapping-4"
+              >Alt Mapping 4</a
+            >
+          </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#alt-mapping-5"
+              >Alt Mapping 5</a
+            >
+          </li>
+          <hr />
+          <li class="nav-item">
+            <p class="m-0">
+              Contribute on Github
+              <a
+                href="https://github.com/JovaniPink/mapping-earthquakes"
+                target="blank"
+                rel="noopener noreferrer"
+                >Mapping Earthquakes</a
+              >.
+            </p>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <!-- Page Content-->
+    <main class="container-fluid p-0">
+      <!-- About-->
+      <section class="eq-section" id="about">
+        <div class="eq-section-content">
+          <h1 class="display-1">Earth & Quake</h1>
+          <div class="subheading mb-5">Earthquakes</div>
+          <p class="lead mb-5">blahablb lb la.</p>
         </div>
-        <!-- / .container-->
+      </section>
+      <hr class="m-0" />
+      <!-- Single Mapping-->
+      <section class="eq-section" id="single-mapping">
+        <div class="eq-section-content">
+          <h2 class="display-2">Single Mapping</h2>
+          <div id="map-single"></div>
+          <!-- The div that holds our map -->
+        </div>
+      </section>
+      <!-- / .section-->
+      <hr class="m-0" />
+      <!-- Multi Mapping-->
+      <section class="eq-section" id="multi-mapping">
+        <div class="eq-section-content">
+          <h2 class="display-2">Multi Mapping</h2>
+          <div id="map-multi"></div>
+          <!-- The div that holds our map -->
+        </div>
+      </section>
+      <!-- / .section-->
+      <hr class="m-0" />
+      <!-- Alt Mapping 3-->
+      <section class="eq-section" id="alt-mapping-3">
+        <div class="eq-section-content">
+          <h2 class="display-2">Alt Mapping 3</h2>
+        </div>
+      </section>
+      <!-- / .section-->
+      <hr class="m-0" />
+      <!-- Alt Mapping 4-->
+      <section class="eq-section" id="alt-mapping-4">
+        <div class="eq-section-content">
+          <h2 class="display-2">Alt Mapping 4</h2>
+        </div>
+      </section>
+      <!-- / .section-->
+      <hr class="m-0" />
+      <!-- Alt Mapping 5-->
+      <section class="eq-section" id="alt-mapping-5">
+        <div class="eq-section-content">
+          <h2 class="display-2">Alt Mapping 5</h2>
+        </div>
       </section>
       <!-- / .section-->
     </main>
-    <aside>
-      <!-- <div class="social-bar">
-        <a href="#">
-          <span class="twitter"></span>
-          <i class="fab fa-twitter"></i>
-        </a>
-        <a href="#">
-          <span class="github"></span>
-          <i class="fab fa-github fa-2x"></i>
-        </a>
-        <a href="#">
-          <span class="linkedin"></span>
-          <i class="fab fa-linkedin fa-2x"></i>
-        </a>
-        <div class="clear"></div>
-      </div> -->
-      <div class="btn-group-fab" role="group" aria-label="FAB Menu">
-        <div>
-          <button
-            type="button"
-            class="btn btn-main btn-primary has-tooltip"
-            data-placement="left"
-            title="Menu"
-          >
-            <svg
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              class="bi bi-align-bottom"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="btn btn-sub btn-info has-tooltip"
-            data-placement="left"
-            title="Fullscreen"
-          >
-            <svg
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              class="bi bi-align-bottom"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="btn btn-sub btn-danger has-tooltip"
-            data-placement="left"
-            title="Save"
-          >
-            <svg
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              class="bi bi-align-bottom"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
-              />
-            </svg>
-          </button>
-          <button
-            type="button"
-            class="btn btn-sub btn-warning has-tooltip"
-            data-placement="left"
-            title="Download"
-          >
-            <svg
-              width="1em"
-              height="1em"
-              viewBox="0 0 16 16"
-              class="bi bi-align-bottom"
-              fill="currentColor"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
-              />
-              <path
-                fill-rule="evenodd"
-                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </aside>
 
     <!-- App JS -->
     <script src="/static/js/app.js"></script>

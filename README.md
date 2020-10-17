@@ -1,5 +1,7 @@
 # mapping-earthquakes
 
+<span>Photo by <a href="https://unsplash.com/@nasa?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">NASA</a> on <a href="https://unsplash.com/s/photos/earth-quakes?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+
 Interactive maps using GeoJSON data.
 
 Purpose
