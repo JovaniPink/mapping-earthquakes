@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!--
+        The above 2 meta tags *must* come first in the <head>
+        to consistently ensure proper document rendering.
+        Any other head element should come *after* these tags.
+      -->
+    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+
+    <!-- Title -->
+    <title>Leaflet-Basic-Map</title>
+
+    <!-- Seo -->
+    <!-- Short description of the document (limit to 150 characters) -->
+    <!-- This content *may* be used as a part of search engine results. -->
+    <meta name="description" content="Leaflet-Basic-Map" />
+    <meta name="leaflet-basic-map" content="leaflet-basic-map" />
+    <meta name="theme-color" content="#211a23" />
+
+    <!-- Verify website ownership -->
+    <meta name="google-site-verification" content="verification_token" />
+    <!-- Google Search Console -->
+    <meta name="msvalidate.01" content="verification_token" />
+    <!-- Favicon -->
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/static/favicon/apple-touch-icon.png"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/static/favicon/favicon-32x32.png"
+    />
+
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/static/favicon/favicon-16x16.png"
+    />
+
+    <link rel="manifest" href="/static/favicon/site.webmanifest" />
+
+    <!-- Facebook -->
+    <meta property="fb:app_id" content="" />
+    <meta property="og:url" content="" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Leaflet-Basic-Map" />
+    <meta property="og:image" content="" />
+    <meta property="og:image:alt" content="Picture of a Map" />
+    <meta
+      property="og:description"
+      content="Maps Visualization done with Leaflet.js."
+    />
+    <meta property="og:site_name" content="Leaflet-Basic-Map" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="article:author"
+      content="https://www.facebook.com/JOVANIPINK"
+    />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="Leaflet-Basic-Map" />
+    <meta name="twitter:creator" content="@JovaniPink" />
+    <meta name="twitter:url" content="" />
+    <meta name="twitter:title" content="Leaflet-Basic-Map" />
+    <meta
+      name="twitter:description"
+      content="Maps Visualization done with Leaflet.js."
+    />
+    <meta name="twitter:image" content="" />
+    <meta name="twitter:image:alt" content="Picture of a Map" />
+
+    <!-- CSS only
+    <link rel="stylesheet" href="/static/css/style.css" /> -->
+  </head>
+
+  <body>
+    <main>
+      <section>
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col d-flex justify-content-center">
+              <div id="mapid"></div>
+              <!-- The div that holds our map -->
+            </div>
+          </div>
+          <!-- / .row-->
+        </div>
+        <!-- / .container-->
+      </section>
+      <!-- / .section-->
+    </main>
+    <aside>
+      <!-- <div class="social-bar">
+        <a href="#">
+          <span class="twitter"></span>
+          <i class="fab fa-twitter"></i>
+        </a>
+        <a href="#">
+          <span class="github"></span>
+          <i class="fab fa-github fa-2x"></i>
+        </a>
+        <a href="#">
+          <span class="linkedin"></span>
+          <i class="fab fa-linkedin fa-2x"></i>
+        </a>
+        <div class="clear"></div>
+      </div> -->
+      <div class="btn-group-fab" role="group" aria-label="FAB Menu">
+        <div>
+          <button
+            type="button"
+            class="btn btn-main btn-primary has-tooltip"
+            data-placement="left"
+            title="Menu"
+          >
+            <svg
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              class="bi bi-align-bottom"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="btn btn-sub btn-info has-tooltip"
+            data-placement="left"
+            title="Fullscreen"
+          >
+            <svg
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              class="bi bi-align-bottom"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="btn btn-sub btn-danger has-tooltip"
+            data-placement="left"
+            title="Save"
+          >
+            <svg
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              class="bi bi-align-bottom"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
+              />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="btn btn-sub btn-warning has-tooltip"
+            data-placement="left"
+            title="Download"
+          >
+            <svg
+              width="1em"
+              height="1em"
+              viewBox="0 0 16 16"
+              class="bi bi-align-bottom"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V2z"
+              />
+              <path
+                fill-rule="evenodd"
+                d="M1 14.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 0 1h-13a.5.5 0 0 1-.5-.5z"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- App JS -->
+    <script src="/static/js/app.js"></script>
+  </body>
+</html>
