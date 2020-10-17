@@ -105,3 +105,4 @@ dist
 
 # Project Files
 static/js/config.js
+.vscode
