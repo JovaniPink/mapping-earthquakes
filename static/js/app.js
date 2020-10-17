@@ -1,12 +1,3 @@
-// Leaflet CSS
-import '../../node_modules/leaflet/dist/leaflet.css';
-import '../../node_modules/leaflet-draw/dist/leaflet.draw.css';
-
-// Importing Leaflet
-import L from 'leaflet';
-import 'leaflet-draw';
-import * as ELG from 'esri-leaflet-geocoder';
-
 // Import config
 import { API_KEY } from './config.js';
 
@@ -22,30 +13,39 @@ import 'bootstrap';
 // Importing the custom scss
 import '../scss/style.scss';
 
+// Leaflet CSS
+import '../../node_modules/leaflet/dist/leaflet.css';
+import '../../node_modules/leaflet-draw/dist/leaflet.draw.css';
+
+// Importing Leaflet
+import L from 'leaflet';
+import 'leaflet-draw';
+import * as ELG from 'esri-leaflet-geocoder';
+
 // Single Point
-// let mapboxTiles = L.tileLayer(
-//   'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
-//   {
-//     attribution:
-//       'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-//     maxZoom: 18,
-//     id: 'mapbox/dark-v10',
-//     tileSize: 512,
-//     zoomOffset: -1,
-//     accessToken: API_KEY,
-//   }
-// );
+let mapboxTiles = L.tileLayer(
+  'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+  {
+    attribution:
+      'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox/dark-v10',
+    tileSize: 512,
+    zoomOffset: -1,
+    accessToken: API_KEY,
+  }
+);
 
-// let marker = L.marker([28.538336, -81.379234]);
+let marker = L.marker([28.538336, -81.379234]);
 
-// let popup = L.popup()
-//   .setLatLng([28.538336, -81.379234])
-//   .setContent('I am a standalone popup.');
+let popup = L.popup()
+  .setLatLng([28.538336, -81.379234])
+  .setContent('I am a standalone popup.');
 
-// let map = L.map('map-single', { layers: [mapboxTiles, marker, popup] }).setView(
-//   [28.538336, -81.379234],
-//   15
-// );
+let map = L.map('map-single', { layers: [mapboxTiles, marker, popup] }).setView(
+  [28.538336, -81.379234],
+  15
+);
 
 const address = '4012 Central Florida Pkwy, Orlando, FL 32837';
 
@@ -108,7 +108,6 @@ let multiMapboxTiles = L.tileLayer(
 );
 
 cities.forEach(function (city) {
-  console.log(city);
   L.circleMarker(city.location, {
     radius: city.population / 200000,
     color: '#582159',
