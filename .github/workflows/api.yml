@@ -22,7 +22,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       - id: log
-        
+
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: sh setEnvironment.sh ${{ secrets.API_KEY }}
+        run: sh ./.github/scripts/setEnvironment.sh ${{ secrets.API_KEY }}
