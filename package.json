@@ -41,7 +41,7 @@
     "dotenv": "8.2.0"
   },
   "devDependencies": {
-    "@types/jquery": "3.5.4",
+    "@types/jquery": "3.5.5",
     "@types/bootstrap": "5.0.1",
     "@types/leaflet": "1.5.19",
     "@types/esri-leaflet-geocoder": "2.2.2",
