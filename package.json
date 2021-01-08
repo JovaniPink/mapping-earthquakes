@@ -37,7 +37,7 @@
     "leaflet-draw": "1.0.4",
     "esri-leaflet-geocoder": "2.3.4",
     "postcss": "8.2.2",
-    "xstate": "4.15.3",
+    "xstate": "4.15.4",
     "dotenv": "8.2.0"
   },
   "devDependencies": {
