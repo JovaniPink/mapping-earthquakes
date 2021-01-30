@@ -35,7 +35,7 @@
     "popper.js": "1.16.1-lts",
     "leaflet": "1.7.1",
     "leaflet-draw": "1.0.4",
-    "esri-leaflet-geocoder": "2.3.4",
+    "esri-leaflet-geocoder": "3.0.0",
     "postcss": "8.2.4",
     "xstate": "4.16.0",
     "dotenv": "8.2.0"
