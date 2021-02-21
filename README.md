@@ -10,7 +10,7 @@
 
 The purpose of this project is to visually show the differences between the magnitudes of earthquakes all over the world for the last seven days with jQuery, Leaflet, GeoJSON data.
 
-## Summary
+## Analysis
 
 Use a set of URLs to map earthquake data (USGS) and retrieve geographical coordinates and the magnitudes of earthquakes for the last seven days and use different styles of maps to display the information.
 
@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_bo
 
 https://raw.githubusercontent.com/josem279/Mapping_Earthquakes/main/4.5_week.geojson
 
-## Analysis and Challenges
+## Results
 
 Your approach will be to use jQuery library to retrieve the coordinates and magnitudes of the earthquakes from the GeoJSON data that is hosted on earthquake.usgs.gov. Using a Mapbox API, the Leaflet JS library through an API request and create interactivity for the earthquake data.
 
@@ -32,7 +32,11 @@ Your approach will be to use jQuery library to retrieve the coordinates and magn
 
 https://mapping-earthquakes.netlify.app/
 
+https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes
+
 ### Theme Colors
+
+https://learnui.design/tools/data-color-picker.html#palette
 
 - #2454a4
 - #7153ac
@@ -55,6 +59,13 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
+1. Fork this repository;
+2. Create your branch: `git checkout -b my-new-feature`;
+3. Commit your changes: `git commit -m 'Add some feature'`;
+4. Push to the branch: `git push origin my-new-feature`.
+
+**After your pull request is merged**, you can safely delete your branch.
+
 ## License
 
-[MIT](https://choosealicense.com/licenses/mit/)
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for more information.

@@ -1,7 +1,7 @@
 {
   "name": "leaflet-basic-map",
   "version": "1.0.0",
-  "description": "Maps Visualization done with Leaflet.js.",
+  "description": "Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JovaniPink/mapping-earthquakes"
@@ -59,6 +59,6 @@
     "prettier": "2.2.1"
   },
   "engines": {
-    "node": ">= 10.19.0"
+    "node": ">= 14.15.5"
   }
 }

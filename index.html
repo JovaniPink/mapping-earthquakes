@@ -14,12 +14,15 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
     <!-- Title -->
-    <title>Leaflet-Basic-Map</title>
+    <title>Mapping Earthquakes</title>
 
     <!-- Seo -->
     <!-- Short description of the document (limit to 150 characters) -->
     <!-- This content *may* be used as a part of search engine results. -->
-    <meta name="description" content="Leaflet-Basic-Map" />
+    <meta
+      name="description"
+      content="Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov."
+    />
     <meta name="leaflet-basic-map" content="leaflet-basic-map" />
     <meta name="theme-color" content="#211a23" />
 
@@ -31,37 +34,40 @@
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="/static/favicon/apple-touch-icon.png"
+      href="./static/favicon/apple-touch-icon.png"
     />
 
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="/static/favicon/favicon-32x32.png"
+      href="./static/favicon/favicon-32x32.png"
     />
 
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="/static/favicon/favicon-16x16.png"
+      href="./static/favicon/favicon-16x16.png"
     />
 
-    <link rel="manifest" href="/static/favicon/site.webmanifest" />
+    <link rel="manifest" href="./static/favicon/site.webmanifest" />
 
     <!-- Facebook -->
     <meta property="fb:app_id" content="" />
-    <meta property="og:url" content="" />
+    <meta
+      property="og:url"
+      content="https://mapping-earthquakes.netlify.app/"
+    />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Leaflet-Basic-Map" />
-    <meta property="og:image" content="" />
+    <meta property="og:title" content="Mapping Earthquakes" />
+    <meta property="og:image" content="./static/images/social.png" />
     <meta property="og:image:alt" content="Picture of a Map" />
     <meta
       property="og:description"
-      content="Maps Visualization done with Leaflet.js."
+      content="Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov."
     />
-    <meta property="og:site_name" content="Leaflet-Basic-Map" />
+    <meta property="og:site_name" content="Mapping Earthquakes" />
     <meta property="og:locale" content="en_US" />
     <meta
       property="article:author"
@@ -69,15 +75,18 @@
     />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="Leaflet-Basic-Map" />
+    <meta name="twitter:card" content="Mapping Earthquakes" />
     <meta name="twitter:creator" content="@JovaniPink" />
-    <meta name="twitter:url" content="" />
-    <meta name="twitter:title" content="Leaflet-Basic-Map" />
+    <meta
+      name="twitter:url"
+      content="https://mapping-earthquakes.netlify.app/"
+    />
+    <meta name="twitter:title" content="Mapping Earthquakes" />
     <meta
       name="twitter:description"
-      content="Maps Visualization done with Leaflet.js."
+      content="Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov."
     />
-    <meta name="twitter:image" content="" />
+    <meta name="twitter:image" content="./static/images/social.png" />
     <meta name="twitter:image:alt" content="Picture of a Map" />
 
     <!-- CSS only
@@ -95,7 +104,7 @@
         <span class="d-none d-lg-block"
           ><img
             class="img-fluid img-profile rounded-circle mx-auto mb-2"
-            src="static/images/earthquake.png"
+            src="./static/images/earthquake.png"
             alt=""
         /></span>
       </a>
@@ -127,7 +136,23 @@
               >Earthquake Mapping</a
             >
           </li>
+          <li class="nav-item">
+            <a class="nav-link js-scroll-trigger" href="#earthquake-mapping"
+              >Tableau Mapping</a
+            >
+          </li>
           <hr />
+          <li class="nav-item">
+            <p class="m-0">
+              Data from USGS Earthquake Hazards Program
+              <a
+                href="https://earthquake.usgs.gov/"
+                target="blank"
+                rel="noopener noreferrer"
+                >USGS</a
+              >.
+            </p>
+          </li>
           <li class="nav-item">
             <p class="m-0">
               Contribute on Github
@@ -147,14 +172,14 @@
       <!-- About-->
       <section class="eq-section" id="about">
         <div class="eq-section-content">
-          <h1 class="display-1">Earth & Quake</h1>
+          <h1 class="display-1">Mapping</h1>
           <h4 class="display-3">Earthquakes</h4>
           <p class="lead">
             Earthquake Mapping using GeoJSON data using JavaScript with D3 and
             Leaflet libraries. Here, a map of earthquakes from the past 7days
             around the globe is created along with a legend indicating the
             intensity of the earthquake. Also, a layer is added that shows
-            Earth's techtonic plates so the earthquake data can be seen in
+            Earth's tectonic plates so the earthquake data can be seen in
             relation to the plates. There are 3 map tile layers that show the
             map as a street map, a satellite map, or an outdoor map.
           </p>
@@ -190,9 +215,64 @@
         </div>
       </section>
       <!-- / .section-->
+      <hr class="m-0" />
+      <!-- Tableau Mapping-->
+      <section class="eq-section" id="tableau-mapping">
+        <div class="eq-section-content">
+          <h2 class="display-2">Tableau Mapping</h2>
+          <div
+            class="tableauPlaceholder"
+            id="viz1613915209129"
+            style="position: relative"
+          >
+            <noscript
+              ><a href="https:&#47;&#47;mapping-earthquakes.netlify.app&#47;"
+                ><img
+                  alt=" "
+                  src="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ma&#47;MappingEarthquakes_16129898573230&#47;MappingEarthquakes&#47;1_rss.png"
+                  style="border: none" /></a></noscript
+            ><object class="tableauViz" style="display: none">
+              <param
+                name="host_url"
+                value="https%3A%2F%2Fpublic.tableau.com%2F"
+              />
+              <param name="embed_code_version" value="3" />
+              <param name="site_root" value="" />
+              <param
+                name="name"
+                value="MappingEarthquakes_16129898573230&#47;MappingEarthquakes"
+              />
+              <param name="tabs" value="no" />
+              <param name="toolbar" value="yes" />
+              <param
+                name="static_image"
+                value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ma&#47;MappingEarthquakes_16129898573230&#47;MappingEarthquakes&#47;1.png"
+              />
+              <param name="animate_transition" value="yes" />
+              <param name="display_static_image" value="yes" />
+              <param name="display_spinner" value="yes" />
+              <param name="display_overlay" value="yes" />
+              <param name="display_count" value="yes" />
+              <param name="language" value="en" />
+            </object>
+          </div>
+          <script type="text/javascript">
+            var divElement = document.getElementById('viz1613915209129');
+            var vizElement = divElement.getElementsByTagName('object')[0];
+            vizElement.style.width = '100%';
+            vizElement.style.height = divElement.offsetWidth * 0.75 + 'px';
+            var scriptElement = document.createElement('script');
+            scriptElement.src =
+              'https://public.tableau.com/javascripts/api/viz_v1.js';
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);
+          </script>
+          <!-- The div that holds the tableau embed -->
+        </div>
+      </section>
+      <!-- / .section-->
     </main>
 
     <!-- App JS -->
-    <script src="/static/js/app.js"></script>
+    <script src="./static/js/app.js"></script>
   </body>
 </html>
