@@ -41,7 +41,7 @@
     "dotenv": "8.2.0"
   },
   "devDependencies": {
-    "@babel/core": "7.13.13",
+    "@babel/core": "7.13.14",
     "@types/autoprefixer": "9.7.2",
     "@types/babel-core": "6.25.6",
     "@types/bootstrap": "5.0.12",
