@@ -38,7 +38,7 @@
     "esri-leaflet-geocoder": "3.0.0",
     "postcss": "8.2.14",
     "xstate": "4.19.1",
-    "dotenv": "9.0.0"
+    "dotenv": "9.0.1"
   },
   "devDependencies": {
     "@babel/core": "7.14.0",
