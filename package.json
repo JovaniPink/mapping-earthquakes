@@ -57,7 +57,7 @@
     "postcss-cli": "8.3.1",
     "prettier": "2.3.0",
     "purgecss": "4.0.3",
-    "sass": "1.32.12"
+    "sass": "1.32.13"
   },
   "engines": {
     "node": ">= 14.15.5"
