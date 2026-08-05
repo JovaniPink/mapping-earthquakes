@@ -1,6 +1,3 @@
-// Import config
-import dotenv from 'dotenv';
-dotenv.config();
 const API_KEY = process.env.API_KEY;
 // import { API_KEY } from './config.js';
 
@@ -11,10 +8,11 @@ import $ from 'jquery';
 import 'jquery.easing';
 
 // Import Bootstrap
-import 'bootstrap';
+import { Collapse, ScrollSpy } from 'bootstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 // Importing the custom scss
-import '../scss/style.scss';
+import '../scss/app.scss';
 
 // Leaflet CSS
 import '../../node_modules/leaflet/dist/leaflet.css';
@@ -22,8 +20,17 @@ import '../../node_modules/leaflet-draw/dist/leaflet.draw.css';
 
 // Importing Leaflet
 import L from 'leaflet';
+import markerIconUrl from 'url:leaflet/dist/images/marker-icon.png';
+import markerIcon2xUrl from 'url:leaflet/dist/images/marker-icon-2x.png';
+import markerShadowUrl from 'url:leaflet/dist/images/marker-shadow.png';
 // import 'leaflet-draw';
 // import * as ELG from 'esri-leaflet-geocoder';
+
+L.Icon.Default.mergeOptions({
+  iconUrl: markerIconUrl,
+  iconRetinaUrl: markerIcon2xUrl,
+  shadowUrl: markerShadowUrl,
+});
 
 // Import Data
 // import eq from '../data/all_week.json';
@@ -42,7 +49,7 @@ const mapboxStyles = {
   satelliteStreet: 'mapbox/satellite-streets-v11',
 };
 
-function titleLayerFunc(styleID, API_KEY = API_KEY) {
+function tileLayerFor(styleID, accessToken) {
   return new L.tileLayer(
     'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
     {
@@ -52,7 +59,7 @@ function titleLayerFunc(styleID, API_KEY = API_KEY) {
       id: styleID,
       tileSize: 512,
       zoomOffset: -1,
-      accessToken: API_KEY,
+      accessToken,
     }
   );
 }
@@ -64,7 +71,7 @@ let popup = L.popup()
   .setContent('I am a standalone popup.');
 
 let map = L.map('map-single', {
-  layers: [titleLayerFunc(mapboxStyles['dark'], API_KEY), marker, popup],
+  layers: [tileLayerFor(mapboxStyles.dark, API_KEY), marker, popup],
 }).setView([28.538336, -81.379234], 15);
 
 //
@@ -122,11 +129,7 @@ let mappedCities = cities.map((city) => {
 });
 
 let multiMap = L.map('map-multi', {
-  layers: [
-    titleLayerFunc(mapboxStyles['dark'], API_KEY),
-    ...mappedCities,
-    popup,
-  ],
+  layers: [tileLayerFor(mapboxStyles.dark, API_KEY), ...mappedCities, popup],
 }).setView([28.538336, -81.379234], 15);
 
 //
@@ -134,14 +137,14 @@ let multiMap = L.map('map-multi', {
 //
 
 let eqMap = L.map('map-earthquakes', {
-  layers: [titleLayerFunc(mapboxStyles['dark'], API_KEY)],
+  layers: [tileLayerFor(mapboxStyles.dark, API_KEY)],
 }).setView([28.538336, -81.379234], 15);
 
 // A base layer that holds all wanted maps and needs to be refactored.
 let baseMaps = {
-  darks: titleLayerFunc(mapboxStyles['dark'], API_KEY),
-  satelliteStreets: titleLayerFunc(mapboxStyles['satelliteStreet'], API_KEY),
-  lights: titleLayerFunc(mapboxStyles['light'], API_KEY),
+  darks: tileLayerFor(mapboxStyles.dark, API_KEY),
+  satelliteStreets: tileLayerFor(mapboxStyles.satelliteStreet, API_KEY),
+  lights: tileLayerFor(mapboxStyles.light, API_KEY),
 };
 
 let earthquakes = new L.layerGroup();
@@ -312,15 +315,16 @@ $.getJSON(
       ];
 
       // Looping through our intervals to generate a label with a colored square for each interval.
-      magnitudes.map((x) => {
+      magnitudes.forEach((x) => {
         div.innerHTML +=
           "<i style='background: " +
           colors[x] +
           "'></i> " +
           magnitudes[x] +
           (magnitudes[x + 1] ? '&ndash;' + magnitudes[x + 1] + '<br>' : '+');
-        return div;
       });
+
+      return div;
     };
 
     legend.addTo(eqMap);
@@ -368,10 +372,12 @@ $('a.js-scroll-trigger[href*="#"]:not([href="#"])').on('click', function () {
 
 // Closes responsive menu when a scroll trigger link is clicked
 $('.js-scroll-trigger').on('click', function () {
-  $('.navbar-collapse').collapse('hide');
+  document.querySelectorAll('.navbar-collapse').forEach((element) => {
+    Collapse.getOrCreateInstance(element, { toggle: false }).hide();
+  });
 });
 
 // Activate scrollspy to add active class to navbar items on scroll
-$('body').scrollspy({
+new ScrollSpy(document.body, {
   target: '#sideNav',
 });

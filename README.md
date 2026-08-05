@@ -66,6 +66,19 @@ Please make sure to update tests as appropriate.
 
 **After your pull request is merged**, you can safely delete your branch.
 
+## Local development
+
+This project uses Node.js 24 and Parcel 2. Set the public Mapbox token before
+starting or building the site:
+
+```sh
+export API_KEY=your_mapbox_public_token
+npm ci
+npm run dev
+```
+
+Run `npm test` to verify formatting and create the optimized production build.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for more information.
