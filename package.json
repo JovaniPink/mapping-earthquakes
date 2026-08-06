@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "parcel index.html",
     "build": "parcel build index.html --dist-dir dist --public-url ./",
-    "format:check": "prettier --check .github/workflows/api.yml index.html static/js/app.js static/scss/app.scss",
+    "format:check": "prettier --check README.md .github/workflows/api.yml index.html static/js/app.js static/scss/app.scss",
     "test": "npm run format:check && npm run build"
   },
   "keywords": [

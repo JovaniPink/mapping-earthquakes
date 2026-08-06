@@ -1,84 +1,113 @@
 # Mapping Earthquakes
 
-> Interactive maps using jQuery, Leaflet, GeoJSON data to map earthquakes.
+An interactive Leaflet project for exploring recent earthquakes, major events,
+and tectonic plate boundaries alongside smaller map demonstrations.
 
-![Earthquake](./resources/earth.jpg)
+![Earth viewed from space](./resources/earth.jpg)
 
-<span>Photo by <a href="https://unsplash.com/@nasa?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">NASA</a> on <a href="https://unsplash.com/s/photos/earth-quakes?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+Photo by [NASA](https://unsplash.com/@nasa) on
+[Unsplash](https://unsplash.com/s/photos/earth-quakes).
 
-## Overview of Project
+## What the site includes
 
-The purpose of this project is to visually show the differences between the magnitudes of earthquakes all over the world for the last seven days with jQuery, Leaflet, GeoJSON data.
+- A single-location Leaflet example centered on Orlando, Florida.
+- A multi-city example whose marker size represents population.
+- An earthquake map with selectable Mapbox base maps and overlay controls.
+- Magnitude-sized and color-coded markers with location details in popups.
+- Separate overlays for all earthquakes, major earthquakes, and tectonic plate
+  boundaries.
+- An embedded Tableau earthquake visualization.
 
-## Analysis
+View the [deployed site](https://mapping-earthquakes.netlify.app/) or the
+[Tableau visualization](https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes).
 
-Use a set of URLs to map earthquake data (USGS) and retrieve geographical coordinates and the magnitudes of earthquakes for the last seven days and use different styles of maps to display the information.
+## Data sources
 
-Data:
+The browser loads GeoJSON directly from these external sources:
 
-https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson
+- [USGS all-earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson)
+- [Tectonic plate boundaries](https://github.com/fraxen/tectonicplates/blob/master/GeoJSON/PB2002_boundaries.json)
+- [Magnitude 4.5+ earthquake fixture](https://github.com/josem279/Mapping_Earthquakes/blob/main/4.5_week.geojson)
 
-https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson
+The USGS feed changes independently of this repository. The two community-hosted
+GeoJSON files are external dependencies and may move or become unavailable.
 
-https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json
+## Requirements
 
-https://raw.githubusercontent.com/josem279/Mapping_Earthquakes/main/4.5_week.geojson
+- Node.js 24 (see [`.nvmrc`](./.nvmrc))
+- npm 11
+- A Mapbox public access token
 
-## Results
-
-Your approach will be to use jQuery library to retrieve the coordinates and magnitudes of the earthquakes from the GeoJSON data that is hosted on earthquake.usgs.gov. Using a Mapbox API, the Leaflet JS library through an API request and create interactivity for the earthquake data.
-
-### Maps
-
-https://mapping-earthquakes.netlify.app/
-
-https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes
-
-### Theme Colors
-
-https://learnui.design/tools/data-color-picker.html#palette
-
-- #2454a4
-- #7153ac
-- #a94da7
-- #d74896
-- #f84d7b
-- #ff635c
-- #ff8339
-- #ffa600
-
-## Todo Checklist
-
-A helpful checklist to gauge how your README is coming on what I would like to finish:
-
-- [ ] Trying to finish a time series control where you could scrub back and forth between dates.
-
-## Contributing
-
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-1. Fork this repository;
-2. Create your branch: `git checkout -b my-new-feature`;
-3. Commit your changes: `git commit -m 'Add some feature'`;
-4. Push to the branch: `git push origin my-new-feature`.
-
-**After your pull request is merged**, you can safely delete your branch.
+The `API_KEY` value is compiled into browser JavaScript, so it is visible to site
+visitors. Use a separate, URL-restricted public token with only the scopes needed
+to read styles and tiles. Never use a secret-scoped token in this project. See
+[Mapbox access-token guidance](https://docs.mapbox.com/accounts/guides/tokens/).
 
 ## Local development
 
-This project uses Node.js 24 and Parcel 2. Set the public Mapbox token before
-starting or building the site:
-
 ```sh
-export API_KEY=your_mapbox_public_token
+nvm use
+export API_KEY=pk.your_public_mapbox_token
 npm ci
 npm run dev
 ```
 
-Run `npm test` to verify formatting and create the optimized production build.
+Parcel prints the local development URL after it starts.
+
+## Commands
+
+| Command                | Purpose                                           |
+| ---------------------- | ------------------------------------------------- |
+| `npm run dev`          | Start the Parcel development server.              |
+| `npm run build`        | Create an optimized production bundle in `dist/`. |
+| `npm run format:check` | Check source, workflow, and README formatting.    |
+| `npm test`             | Run the formatting check and production build.    |
+
+For a dependency-security check, run `npm audit --audit-level=low` after
+`npm ci`.
+
+## Project structure
+
+```text
+.
+├── index.html                 # Page structure and metadata
+├── resources/                # Images and reference data
+├── static/js/app.js          # Leaflet maps, layers, and data loading
+├── static/scss/app.scss      # Site styles
+└── .github/workflows/api.yml # Install, formatting, and build checks
+```
+
+Parcel injects `API_KEY` into `static/js/app.js` at build time. Leaflet renders
+the maps, Mapbox supplies base-map tiles, and jQuery loads the GeoJSON overlays.
+
+## Validation and deployment
+
+Pull requests are expected to pass `npm test` on the Node version in `.nvmrc`.
+The GitHub Actions workflow requires an `API_KEY` repository secret because the
+production build resolves the Mapbox token.
+
+For a static host such as Netlify, use:
+
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Environment variable: `API_KEY` set to the restricted public Mapbox token
+
+The application depends on live third-party tile and GeoJSON requests. A
+successful build proves that the bundle compiles; it does not prove those
+external services are currently reachable.
+
+## Roadmap
+
+- Add automated behavior tests for layer controls and data rendering.
+- Replace the community-hosted major-earthquake fixture with a maintained live
+  source or a versioned local fixture.
+- Add a time-series control for scrubbing through earthquake dates.
+
+## Contributing
+
+Open an issue before making a large behavioral change. For pull requests, keep
+changes focused and run `npm test` before requesting review.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for more information.
+Licensed under the MIT License. See [LICENSE.md](./LICENSE.md).
