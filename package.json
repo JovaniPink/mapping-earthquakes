@@ -8,17 +8,18 @@
   },
   "homepage": "https://github.com/JovaniPink/mapping-earthquakes#readme",
   "packageManager": "npm@11.12.1",
+  "type": "module",
   "scripts": {
     "dev": "parcel index.html",
     "build": "parcel build index.html --dist-dir dist --public-url ./",
-    "format:check": "prettier --check README.md .github/workflows/api.yml index.html static/js/app.js static/scss/app.scss",
-    "test": "npm run format:check && npm run build"
+    "format:check": "prettier --check README.md .github/workflows/api.yml index.html static/js/app.js static/js/earthquake-data.js static/scss/app.scss tests/*.test.mjs",
+    "test:unit": "node --test tests/*.test.mjs",
+    "test": "npm run format:check && npm run test:unit && npm run build"
   },
   "keywords": [
     "bootstrap",
     "sass",
     "javascript",
-    "jQuery",
     "leaflet",
     "mapbox",
     "dashboard"
@@ -27,11 +28,7 @@
   "license": "MIT",
   "dependencies": {
     "bootstrap": "5.3.8",
-    "jquery": "3.7.1",
-    "jquery.easing": "1.4.1",
-    "leaflet": "1.9.4",
-    "leaflet-draw": "1.0.4",
-    "postcss": "8.5.25"
+    "leaflet": "1.9.4"
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "^2.16.4",

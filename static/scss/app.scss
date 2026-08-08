@@ -50,6 +50,10 @@ html {
   -webkit-text-size-adjust: 100%;
 }
 
+section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
 body {
   margin: 0;
   padding-top: 3.375rem;
