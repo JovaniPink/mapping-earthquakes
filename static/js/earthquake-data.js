@@ -1,11 +1,20 @@
-export const DATA_SOURCES = Object.freeze({
+export const LIVE_DATA_SOURCES = Object.freeze({
   allEarthquakes:
     'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson',
   majorEarthquakes:
     'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson',
-  tectonicPlates:
-    'https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json',
 });
+
+export const DATA_REQUEST_TIMEOUT_MS = 10_000;
+
+export function createDataSources(tectonicPlatesUrl) {
+  const tectonicPlates = String(tectonicPlatesUrl ?? '').trim();
+  if (!tectonicPlates) {
+    throw new Error('A bundled tectonic-plate URL is required');
+  }
+
+  return Object.freeze({ ...LIVE_DATA_SOURCES, tectonicPlates });
+}
 
 const MAGNITUDE_COLORS = Object.freeze([
   '#665191',
@@ -64,20 +73,39 @@ export function getEarthquakePopup(feature) {
   return `<strong>Magnitude:</strong> ${escapeHtml(displayMagnitude)}<br><strong>Location:</strong> ${escapeHtml(place)}`;
 }
 
-export async function fetchFeatureCollection(url, request = fetch) {
-  const response = await request(url);
+export async function fetchFeatureCollection(
+  url,
+  request = fetch,
+  timeoutMs = DATA_REQUEST_TIMEOUT_MS
+) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  if (!response.ok) {
-    throw new Error(`Request failed with HTTP ${response.status}`);
+  try {
+    const response = await request(url, { signal: controller.signal });
+
+    if (!response.ok) {
+      throw new Error(`Request failed with HTTP ${response.status}`);
+    }
+
+    const payload = await response.json();
+    if (
+      payload?.type !== 'FeatureCollection' ||
+      !Array.isArray(payload.features)
+    ) {
+      throw new Error('Response is not a GeoJSON FeatureCollection');
+    }
+
+    return payload;
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(`Data request timed out after ${timeoutMs}ms`, {
+        cause: error,
+      });
+    }
+
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
-
-  const payload = await response.json();
-  if (
-    payload?.type !== 'FeatureCollection' ||
-    !Array.isArray(payload.features)
-  ) {
-    throw new Error('Response is not a GeoJSON FeatureCollection');
-  }
-
-  return payload;
 }

@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
-  DATA_SOURCES,
+  createDataSources,
   escapeHtml,
   fetchFeatureCollection,
   getEarthquakeColor,
@@ -11,12 +12,31 @@ import {
   getLegendEntries,
 } from '../static/js/earthquake-data.js';
 
+const dataSources = createDataSources(
+  new URL('../static/data/PB2002_boundaries.json', import.meta.url)
+);
+
 test('uses maintained USGS feeds for both earthquake layers', () => {
   assert.match(
-    DATA_SOURCES.allEarthquakes,
+    dataSources.allEarthquakes,
     /^https:\/\/earthquake\.usgs\.gov\//
   );
-  assert.match(DATA_SOURCES.majorEarthquakes, /\/4\.5_week\.geojson$/);
+  assert.match(dataSources.majorEarthquakes, /\/4\.5_week\.geojson$/);
+});
+
+test('uses the repository-owned tectonic-plate snapshot', async () => {
+  assert.doesNotMatch(dataSources.tectonicPlates, /^https?:/);
+  assert.match(dataSources.tectonicPlates, /PB2002_boundaries\.json$/);
+
+  const payload = JSON.parse(
+    await readFile(new URL(dataSources.tectonicPlates), 'utf8')
+  );
+  assert.equal(payload.type, 'FeatureCollection');
+  assert.equal(payload.features.length, 241);
+});
+
+test('requires an explicit bundled tectonic-plate URL', () => {
+  assert.throws(() => createDataSources('  '), /tectonic-plate URL/);
 });
 
 test('maps earthquake magnitudes to stable marker styles', () => {
@@ -74,5 +94,19 @@ test('rejects HTTP and schema failures with useful errors', async () => {
       json: async () => ({ type: 'Feature' }),
     })),
     /FeatureCollection/
+  );
+});
+
+test('bounds stalled data requests with an abortable timeout', async () => {
+  await assert.rejects(
+    fetchFeatureCollection(
+      'https://example.test/feed',
+      (_url, { signal }) =>
+        new Promise((_resolve, reject) => {
+          signal.addEventListener('abort', () => reject(new Error('aborted')));
+        }),
+      5
+    ),
+    /timed out after 5ms/
   );
 });

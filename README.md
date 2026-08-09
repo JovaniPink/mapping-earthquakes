@@ -17,6 +17,7 @@ Photo by [NASA](https://unsplash.com/@nasa) on
 - Separate overlays for all earthquakes, major earthquakes, and tectonic plate
   boundaries.
 - An embedded Tableau earthquake visualization.
+- A noindex legacy Tableau WDC 2.x compatibility page for older workbooks.
 
 View the [deployed site](https://mapping-earthquakes.netlify.app/) or the
 [Tableau visualization](https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes).
@@ -26,13 +27,19 @@ View the [deployed site](https://mapping-earthquakes.netlify.app/) or the
 The browser loads GeoJSON directly from these external sources:
 
 - [USGS all-earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson)
-- [Tectonic plate boundaries](https://github.com/fraxen/tectonicplates/blob/master/GeoJSON/PB2002_boundaries.json)
 - [USGS magnitude 4.5+ earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson)
 
 The USGS feeds update every minute and change independently of this repository.
-The community-maintained tectonic-plate file may move or become unavailable;
-the interface reports individual layer failures while leaving healthy layers
-interactive.
+Each request has a ten-second timeout, and the interface reports individual
+layer failures while leaving healthy layers interactive.
+
+Tectonic boundaries use the repository-owned
+[`static/data/PB2002_boundaries.json`](./static/data/PB2002_boundaries.json)
+snapshot instead of a runtime request to GitHub. It is structurally equal to the
+current upstream GeoJSON and is bundled by Parcel as a versioned build asset.
+The dataset comes from Hugo Ahlenius/Nordpil's conversion of Peter Bird's plate
+model and is available under the Open Data Commons Attribution License. See
+[`THIRD_PARTY_DATA.md`](./THIRD_PARTY_DATA.md) for provenance and attribution.
 
 ## Requirements
 
@@ -61,13 +68,14 @@ the local development URL after it starts.
 
 ## Commands
 
-| Command                | Purpose                                           |
-| ---------------------- | ------------------------------------------------- |
-| `npm run dev`          | Start the Parcel development server.              |
-| `npm run build`        | Create an optimized production bundle in `dist/`. |
-| `npm run format:check` | Check source, workflow, and README formatting.    |
-| `npm run test:unit`    | Test feed, styling, popup, and schema contracts.  |
-| `npm test`             | Run formatting, unit tests, and production build. |
+| Command                | Purpose                                            |
+| ---------------------- | -------------------------------------------------- |
+| `npm run dev`          | Start the Parcel development server.               |
+| `npm run build`        | Create an optimized production bundle in `dist/`.  |
+| `npm run format:check` | Check source, workflow, and README formatting.     |
+| `npm run test:unit`    | Test feed, styling, popup, and schema contracts.   |
+| `npm run test:dist`    | Verify the generated data and JavaScript assets.   |
+| `npm test`             | Run formatting, tests, build, and artifact checks. |
 
 For a dependency-security check, run `npm audit --audit-level=low` after
 `npm ci`.
@@ -78,17 +86,21 @@ For a dependency-security check, run `npm audit --audit-level=low` after
 .
 ├── index.html                 # Page structure and metadata
 ├── resources/                # Images and reference data
+├── static/data/               # Bundled tectonic-plate snapshot
 ├── static/js/app.js          # Leaflet maps and browser integration
 ├── static/js/earthquake-data.js # Feed URLs and testable data contracts
 ├── static/scss/app.scss      # Site styles
 ├── tests/                    # Node unit tests
+├── THIRD_PARTY_DATA.md       # Dataset provenance and licensing
+├── .parcelrc                 # Raw JSON asset pipeline
 └── .github/workflows/api.yml # Install, formatting, and build checks
 ```
 
 Leaflet renders the maps, OpenStreetMap supplies the default tiles, and optional
-Mapbox styles are enabled when Parcel injects `API_KEY` at build time. The
-browser Fetch API loads each GeoJSON overlay independently. External feed values
-are escaped before they are rendered in popup HTML.
+Mapbox styles are enabled when Parcel injects `API_KEY` at build time. Parcel
+emits the local tectonic dataset as a content-addressed build asset. The browser
+Fetch API loads each GeoJSON overlay independently with bounded request times.
+External feed values are escaped before they are rendered in popup HTML.
 
 ## Validation and deployment
 
@@ -109,11 +121,28 @@ The application depends on live third-party tile and GeoJSON requests. A
 successful build proves that the bundle compiles; it does not prove those
 external services are currently reachable.
 
+The default OpenStreetMap raster service is best-effort and has no SLA. The
+browser uses the required HTTPS tile URL, visible attribution, normal browser
+caching, and user-driven interactive viewing; it does not prefetch tiles. Review
+the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+before adding automated map traversal, offline downloads, or material traffic.
+
+### Legacy Tableau connector
+
+[`wdc-usga-gov.html`](./wdc-usga-gov.html) remains available for older workbook
+compatibility and now uses dependency-free Fetch with explicit Tableau error
+reporting. Tableau documents the WDC 2.x framework as deprecated and recommends
+the REST API Connector for supported current clients. Do not build new workbook
+architecture on the legacy page; migration or removal requires a separate
+owner-reviewed decision.
+
 ## Roadmap
 
 - Add browser-level behavior tests for layer controls and partial-feed failures.
-- Version the tectonic-plate data locally or move to a maintained authoritative
-  source.
+- Document and review any future tectonic-plate snapshot refresh as a licensed
+  data update.
+- Migrate legacy Tableau consumers to the REST API Connector, then remove the
+  WDC 2.x compatibility page.
 - Add a time-series control for scrubbing through earthquake dates.
 
 ## Contributing

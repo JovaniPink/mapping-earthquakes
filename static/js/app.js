@@ -5,10 +5,11 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2xUrl from 'url:leaflet/dist/images/marker-icon-2x.png';
 import markerIconUrl from 'url:leaflet/dist/images/marker-icon.png';
 import markerShadowUrl from 'url:leaflet/dist/images/marker-shadow.png';
+import tectonicPlatesUrl from 'url:../data/PB2002_boundaries.json';
 
 import '../scss/app.scss';
 import {
-  DATA_SOURCES,
+  createDataSources,
   fetchFeatureCollection,
   getEarthquakeColor,
   getEarthquakePopup,
@@ -18,6 +19,7 @@ import {
 
 const MAPBOX_TOKEN = process.env.API_KEY;
 const ORLANDO = [28.538336, -81.379234];
+const dataSources = createDataSources(tectonicPlatesUrl);
 
 const mapboxStyles = Object.freeze({
   dark: 'mapbox/dark-v11',
@@ -197,19 +199,19 @@ addLegend(earthquakeMap);
 const layerRequests = [
   {
     label: 'earthquakes',
-    result: fetchFeatureCollection(DATA_SOURCES.allEarthquakes).then((data) =>
+    result: fetchFeatureCollection(dataSources.allEarthquakes).then((data) =>
       createEarthquakeLayer(data).addTo(overlays.Earthquakes)
     ),
   },
   {
     label: 'major earthquakes',
-    result: fetchFeatureCollection(DATA_SOURCES.majorEarthquakes).then((data) =>
+    result: fetchFeatureCollection(dataSources.majorEarthquakes).then((data) =>
       createEarthquakeLayer(data).addTo(overlays['Major earthquakes (M4.5+)'])
     ),
   },
   {
     label: 'tectonic plates',
-    result: fetchFeatureCollection(DATA_SOURCES.tectonicPlates).then((data) =>
+    result: fetchFeatureCollection(dataSources.tectonicPlates).then((data) =>
       L.geoJSON(data, { style: { color: '#2f4b7c', weight: 3 } }).addTo(
         overlays['Tectonic plates']
       )
