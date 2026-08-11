@@ -105,7 +105,7 @@ External feed values are escaped before they are rendered in popup HTML.
 ## Validation and deployment
 
 Pull requests are expected to pass `npm test` and
-`npm audit --audit-level=high` on the Node version in `.nvmrc`. CI does not need
+`npm audit --audit-level=low` on the Node version in `.nvmrc`. CI does not need
 a Mapbox token because OpenStreetMap is the runtime fallback. Preview and
 production hosts may provide a URL-restricted public token for the optional
 Mapbox layers.
