@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile, readdir } from 'node:fs/promises';
+import { readFile, readdir, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import test from 'node:test';
@@ -36,4 +36,20 @@ test('ships the tectonic-plate snapshot without the GitHub runtime URL', async (
     await Promise.all(bundles.map((filename) => readFile(filename, 'utf8')))
   ).join('\n');
   assert.doesNotMatch(javascript, /raw\.githubusercontent\.com\/fraxen/);
+});
+
+test('ships one web-sized navigation image', async () => {
+  const files = await listFiles(fileURLToPath(distDirectory));
+  const navigationImages = files.filter(
+    (filename) =>
+      path.basename(filename).startsWith('earthquake.') &&
+      filename.endsWith('.webp')
+  );
+
+  assert.equal(navigationImages.length, 1);
+  const metadata = await stat(navigationImages[0]);
+  assert.ok(
+    metadata.size < 100 * 1024,
+    `expected navigation image under 100 KiB, received ${metadata.size} bytes`
+  );
 });

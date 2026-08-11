@@ -42,3 +42,11 @@ test('social metadata uses valid public contracts', () => {
     /verification_token|property="fb:app_id" content=""/
   );
 });
+
+test('uses a web-sized, dimensioned navigation image', () => {
+  assert.match(
+    compactHtml,
+    /src="\.\/static\/images\/earthquake\.webp" width="512" height="512" alt=""/
+  );
+  assert.doesNotMatch(html, /earthquake\.png/);
+});

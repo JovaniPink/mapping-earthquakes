@@ -87,6 +87,7 @@ For a dependency-security check, run `npm audit --audit-level=low` after
 ├── index.html                 # Page structure and metadata
 ├── resources/                # Images and reference data
 ├── static/data/               # Bundled tectonic-plate snapshot
+├── static/images/             # Web-sized interface and social assets
 ├── static/js/app.js          # Leaflet maps and browser integration
 ├── static/js/earthquake-data.js # Feed URLs and testable data contracts
 ├── static/scss/app.scss      # Site styles
@@ -101,6 +102,9 @@ Mapbox styles are enabled when Parcel injects `API_KEY` at build time. Parcel
 emits the local tectonic dataset as a content-addressed build asset. The browser
 Fetch API loads each GeoJSON overlay independently with bounded request times.
 External feed values are escaped before they are rendered in popup HTML.
+The decorative sidebar image is a 512-pixel WebP rather than the original
+multi-megabyte source, and explicit dimensions reserve its layout space before
+the asset loads.
 
 ## Validation and deployment
 
