@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile, readdir, stat } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import test from 'node:test';
@@ -26,10 +26,17 @@ test('ships the tectonic-plate snapshot without the GitHub runtime URL', async (
       filename.endsWith('.json')
   );
 
-  assert.equal(tectonicFiles.length, 1);
-  const payload = JSON.parse(await readFile(tectonicFiles[0], 'utf8'));
-  assert.equal(payload.type, 'FeatureCollection');
-  assert.equal(payload.features.length, 241);
+  assert.ok(
+    tectonicFiles.length >= 1,
+    'expected at least one emitted tectonic snapshot'
+  );
+  const payloads = await Promise.all(
+    tectonicFiles.map((filename) => readFile(filename, 'utf8').then(JSON.parse))
+  );
+  for (const payload of payloads) {
+    assert.equal(payload.type, 'FeatureCollection');
+    assert.equal(payload.features.length, 241);
+  }
 
   const bundles = files.filter((filename) => filename.endsWith('.js'));
   const javascript = (
@@ -38,19 +45,48 @@ test('ships the tectonic-plate snapshot without the GitHub runtime URL', async (
   assert.doesNotMatch(javascript, /raw\.githubusercontent\.com\/fraxen/);
 });
 
-test('ships one web-sized navigation image', async () => {
+test('ships the labeled USGS fallback and its receipt', async () => {
   const files = await listFiles(fileURLToPath(distDirectory));
-  const navigationImages = files.filter(
-    (filename) =>
-      path.basename(filename).startsWith('earthquake.') &&
-      filename.endsWith('.webp')
+  const fallbackFiles = files.filter((filename) =>
+    path.basename(filename).startsWith('significant_month.')
+  );
+  const payloads = await Promise.all(
+    fallbackFiles.map(async (filename) => ({
+      filename,
+      payload: JSON.parse(await readFile(filename, 'utf8')),
+    }))
+  );
+  const snapshot = payloads.find(
+    ({ payload }) => payload.type === 'FeatureCollection'
+  );
+  const receipt = payloads.find(
+    ({ payload }) => payload.sourceUrl && payload.sha256
   );
 
-  assert.equal(navigationImages.length, 1);
-  const metadata = await stat(navigationImages[0]);
-  assert.ok(
-    metadata.size < 100 * 1024,
-    `expected navigation image under 100 KiB, received ${metadata.size} bytes`
+  assert.ok(snapshot, 'expected the significant-event GeoJSON snapshot');
+  assert.ok(receipt, 'expected the significant-event metadata receipt');
+  assert.equal(snapshot.payload.features.length, receipt.payload.featureCount);
+  assert.match(receipt.payload.sourceUrl, /^https:\/\/earthquake\.usgs\.gov\//);
+});
+
+test('builds MapLibre runtime with the official live feed and no retired snapshots', async () => {
+  const files = await listFiles(fileURLToPath(distDirectory));
+  const javascriptFiles = files.filter((filename) => filename.endsWith('.js'));
+  const javascript = (
+    await Promise.all(
+      javascriptFiles.map((filename) => readFile(filename, 'utf8'))
+    )
+  ).join('\n');
+
+  assert.ok(javascriptFiles.length > 0);
+  assert.match(javascript, /all_month\.geojson/);
+  assert.doesNotMatch(
+    javascript,
+    /all_week\.json|static\/data\/all_month\.geojson/
+  );
+  assert.doesNotMatch(
+    javascript,
+    /@parcel\/runtime-browser-hmr|Connection to the HMR server was lost/
   );
 });
 

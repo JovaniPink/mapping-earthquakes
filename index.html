@@ -3,282 +3,375 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Title -->
-    <title>Mapping Earthquakes</title>
-
-    <!-- Seo -->
-    <!-- Short description of the document (limit to 150 characters) -->
-    <!-- This content *may* be used as a part of search engine results. -->
+    <title>Earthquake Atlas — Mapping Earthquakes</title>
     <meta
       name="description"
-      content="Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov."
+      content="Explore the latest month of earthquakes reported by the USGS on a full-screen interactive globe."
     />
-    <meta name="leaflet-basic-map" content="leaflet-basic-map" />
-    <meta name="theme-color" content="#211a23" />
+    <meta name="theme-color" content="#080d12" />
     <link rel="canonical" href="https://mapping-earthquakes.netlify.app/" />
-    <!-- Favicon -->
     <link
       rel="apple-touch-icon"
       sizes="180x180"
       href="./static/favicon/apple-touch-icon.png"
     />
-
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
       href="./static/favicon/favicon-32x32.png"
     />
-
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
       href="./static/favicon/favicon-16x16.png"
     />
-
     <link rel="manifest" href="./static/favicon/site.webmanifest" />
-
-    <!-- Facebook -->
     <meta
       property="og:url"
       content="https://mapping-earthquakes.netlify.app/"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Mapping Earthquakes" />
-    <meta property="og:image" content="./static/images/social.png" />
-    <meta property="og:image:alt" content="Picture of a Map" />
+    <meta property="og:title" content="Earthquake Atlas" />
+    <meta
+      property="og:image"
+      content="./static/images/social.png"
+    />
+    <meta property="og:image:alt" content="Earthquakes mapped worldwide" />
     <meta
       property="og:description"
-      content="Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov."
+      content="A full-screen observed-data explorer for the latest month of USGS earthquakes."
     />
     <meta property="og:site_name" content="Mapping Earthquakes" />
     <meta property="og:locale" content="en_US" />
-    <meta
-      property="article:author"
-      content="https://www.facebook.com/JOVANIPINK"
-    />
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@JovaniPink" />
-    <meta
-      name="twitter:url"
-      content="https://mapping-earthquakes.netlify.app/"
-    />
-    <meta name="twitter:title" content="Mapping Earthquakes" />
+    <meta name="twitter:title" content="Earthquake Atlas" />
     <meta
       name="twitter:description"
-      content="Interactive Earthquake Mapping using GeoJSON data from earthquake.usgs.gov."
+      content="A full-screen observed-data explorer for the latest month of USGS earthquakes."
     />
-    <meta name="twitter:image" content="./static/images/social.png" />
-    <meta name="twitter:image:alt" content="Picture of a Map" />
-
-    <!-- CSS only
-    <link rel="stylesheet" href="/static/css/style.css" /> -->
+    <meta
+      name="twitter:image"
+      content="./static/images/social.png"
+    />
   </head>
+  <body>
+    <a class="skip-link" href="#atlas-controls">Skip to atlas controls</a>
+    <main class="atlas-shell" aria-label="Earthquake Atlas">
+      <div
+        id="earthquake-map"
+        class="atlas-map"
+        role="application"
+        aria-label="Interactive map of earthquakes reported by the USGS"
+      ></div>
 
-  <body id="page-top">
-    <!-- Navigation-->
-    <nav
-      class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top"
-      id="sideNav"
-    >
-      <a class="navbar-brand js-scroll-trigger" href="#page-top">
-        <span class="d-block d-lg-none">MAPPING EARTHQUAKES</span>
-        <span class="d-none d-lg-block"
-          ><img
-            class="img-fluid img-profile rounded-circle mx-auto mb-2"
-            src="./static/images/earthquake.webp"
-            width="512"
-            height="512"
-            alt=""
-        /></span>
-      </a>
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
+      <section
+        class="atlas-panel"
+        id="atlas-controls"
+        aria-labelledby="atlas-title"
       >
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav">
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#single-mapping"
-              >Single Mapping</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#multi-mapping"
-              >Multi Mapping</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#earthquake-mapping"
-              >Earthquake Mapping</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#tableau-mapping"
-              >Tableau Mapping</a
-            >
-          </li>
-          <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="./wdc-usga-gov.html"
-              >Legacy Tableau WDC</a
-            >
-          </li>
-          <hr />
-          <li class="nav-item">
-            <p class="m-0">
-              Data from USGS Earthquake Hazards Program
-              <a
-                href="https://earthquake.usgs.gov/"
-                target="_blank"
-                rel="noopener noreferrer"
-                >USGS</a
-              >.
-            </p>
-          </li>
-          <li class="nav-item">
-            <p class="m-0">
-              Plate boundaries from
-              <a
-                href="https://github.com/fraxen/tectonicplates"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Hugo Ahlenius, Nordpil, and Peter Bird</a
-              >, licensed under ODC-By 1.0.
-            </p>
-          </li>
-          <li class="nav-item">
-            <p class="m-0">
-              Contribute on Github
-              <a
-                href="https://github.com/JovaniPink/mapping-earthquakes"
-                target="_blank"
-                rel="noopener noreferrer"
-                >Mapping Earthquakes</a
-              >.
-            </p>
-          </li>
-        </ul>
-      </div>
-    </nav>
-    <!-- Page Content-->
-    <main class="container-fluid p-0">
-      <!-- About-->
-      <section class="eq-section" id="about">
-        <div class="eq-section-content">
-          <h1 class="display-1">Mapping</h1>
-          <h4 class="display-3">Earthquakes</h4>
-          <p class="lead">
-            Explore earthquakes reported during the past seven days with
-            JavaScript, Leaflet, and official USGS GeoJSON feeds. Marker size
-            and color show magnitude, while optional tectonic-plate and Mapbox
-            base layers provide geographic context.
-          </p>
-        </div>
-      </section>
-      <hr class="m-0" />
-      <!-- Single Mapping-->
-      <section class="eq-section" id="single-mapping">
-        <div class="eq-section-content">
-          <h2 class="display-2">Single Mapping</h2>
-          <div id="map-single"></div>
-          <!-- The div that holds our map -->
-        </div>
-      </section>
-      <!-- / .section-->
-      <hr class="m-0" />
-      <!-- Multi Mapping-->
-      <section class="eq-section" id="multi-mapping">
-        <div class="eq-section-content">
-          <h2 class="display-2">Multi Mapping</h2>
-          <div id="map-multi"></div>
-          <!-- The div that holds our map -->
-        </div>
-      </section>
-      <!-- / .section-->
-      <hr class="m-0" />
-      <!-- Earthquake Mapping-->
-      <section class="eq-section" id="earthquake-mapping">
-        <div class="eq-section-content">
-          <h2 class="display-2">Earthquake Mapping</h2>
-          <div id="map-earthquakes"></div>
-          <div
-            id="earthquake-status"
-            class="alert alert-warning d-none mt-3"
-            role="alert"
-          ></div>
-          <!-- The div that holds our map -->
-        </div>
-      </section>
-      <!-- / .section-->
-      <hr class="m-0" />
-      <!-- Tableau Mapping-->
-      <section class="eq-section" id="tableau-mapping">
-        <div class="eq-section-content">
-          <h2 class="display-2">Tableau Mapping</h2>
-          <div
-            class="tableauPlaceholder"
-            id="viz1613915209129"
-            style="position: relative"
-          >
-            <noscript
-              ><a href="https:&#47;&#47;mapping-earthquakes.netlify.app&#47;"
-                ><img
-                  alt=" "
-                  src="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ma&#47;MappingEarthquakes_16129898573230&#47;MappingEarthquakes&#47;1_rss.png"
-                  style="border: none" /></a></noscript
-            ><object class="tableauViz" style="display: none">
-              <param
-                name="host_url"
-                value="https%3A%2F%2Fpublic.tableau.com%2F"
-              />
-              <param name="embed_code_version" value="3" />
-              <param name="site_root" value="" />
-              <param
-                name="name"
-                value="MappingEarthquakes_16129898573230&#47;MappingEarthquakes"
-              />
-              <param name="tabs" value="no" />
-              <param name="toolbar" value="yes" />
-              <param
-                name="static_image"
-                value="https:&#47;&#47;public.tableau.com&#47;static&#47;images&#47;Ma&#47;MappingEarthquakes_16129898573230&#47;MappingEarthquakes&#47;1.png"
-              />
-              <param name="animate_transition" value="yes" />
-              <param name="display_static_image" value="yes" />
-              <param name="display_spinner" value="yes" />
-              <param name="display_overlay" value="yes" />
-              <param name="display_count" value="yes" />
-              <param name="language" value="en" />
-            </object>
+        <header class="atlas-brand">
+          <div class="atlas-brand__lockup">
+            <svg class="atlas-mark" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="22"></circle>
+              <path d="M8 25h8l3-8 5 17 4-12 3 6h9"></path>
+            </svg>
+            <div>
+              <p>Mapping Earthquakes</p>
+              <h1 id="atlas-title">Earthquake Atlas</h1>
+            </div>
           </div>
-          <script type="text/javascript">
-            var divElement = document.getElementById('viz1613915209129');
-            var vizElement = divElement.getElementsByTagName('object')[0];
-            vizElement.style.width = '100%';
-            vizElement.style.height = divElement.offsetWidth * 0.75 + 'px';
-            var scriptElement = document.createElement('script');
-            scriptElement.src =
-              'https://public.tableau.com/javascripts/api/viz_v1.js';
-            vizElement.parentNode.insertBefore(scriptElement, vizElement);
-          </script>
-          <!-- The div that holds the tableau embed -->
+          <button
+            class="icon-button panel-toggle"
+            id="panel-toggle"
+            type="button"
+            aria-expanded="true"
+            aria-controls="atlas-panel-body"
+          >
+            <span aria-hidden="true">−</span>
+            <span class="visually-hidden">Collapse atlas panel</span>
+          </button>
+        </header>
+
+        <div class="atlas-panel__body" id="atlas-panel-body">
+          <div
+            class="feed-state"
+            data-tone="loading"
+            id="feed-state"
+            role="status"
+          >
+            <span class="feed-state__dot" aria-hidden="true"></span>
+            <div>
+              <strong id="feed-label">Connecting to USGS</strong>
+              <span id="feed-detail">Requesting the latest monthly feed…</span>
+            </div>
+            <button class="text-button" id="refresh-data" type="button">
+              Refresh
+            </button>
+          </div>
+
+          <div class="summary-grid" aria-label="Filtered earthquake summary">
+            <div>
+              <span>Events</span>
+              <strong id="summary-count">—</strong>
+            </div>
+            <div>
+              <span>Strongest</span>
+              <strong id="summary-strongest">—</strong>
+            </div>
+            <div>
+              <span>Shallow</span>
+              <strong id="summary-shallow">—</strong>
+            </div>
+          </div>
+
+          <label class="search-control" for="place-search">
+            <span class="visually-hidden">Search earthquake locations</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m16 16 5 5"></path>
+            </svg>
+            <input
+              id="place-search"
+              type="search"
+              placeholder="Search places in this window"
+              autocomplete="off"
+            />
+          </label>
+
+          <details class="filter-drawer" open>
+            <summary>
+              <span>Observation filters</span>
+              <span id="filter-summary">M0+ · all depths · 7 days</span>
+            </summary>
+            <div class="filter-grid">
+              <label class="range-control" for="magnitude-filter">
+                <span>Minimum magnitude</span>
+                <output id="magnitude-output" for="magnitude-filter"
+                  >M0+</output
+                >
+                <input
+                  id="magnitude-filter"
+                  type="range"
+                  min="0"
+                  max="7"
+                  step="0.5"
+                  value="0"
+                />
+              </label>
+              <label>
+                <span>Depth</span>
+                <select id="depth-filter">
+                  <option value="all">All depths</option>
+                  <option value="shallow">Shallow · under 70 km</option>
+                  <option value="intermediate">Intermediate · 70–300 km</option>
+                  <option value="deep">Deep · over 300 km</option>
+                </select>
+              </label>
+              <label>
+                <span>Window</span>
+                <select id="window-filter">
+                  <option value="1">Past 24 hours</option>
+                  <option value="7" selected>Past 7 days</option>
+                  <option value="30">Past 30 days</option>
+                </select>
+              </label>
+            </div>
+          </details>
+
+          <div class="panel-actions">
+            <button
+              class="primary-button"
+              id="focus-strongest"
+              type="button"
+              disabled
+            >
+              Focus strongest <span aria-hidden="true">→</span>
+            </button>
+            <button class="secondary-button" id="reset-filters" type="button">
+              Reset
+            </button>
+          </div>
+
+          <section class="event-results" aria-labelledby="event-results-title">
+            <div class="section-heading">
+              <h2 id="event-results-title">Strongest in view</h2>
+              <span id="result-count">0 results</span>
+            </div>
+            <ol id="event-list"></ol>
+          </section>
+
+          <p class="panel-notice" id="panel-notice" role="alert" hidden></p>
         </div>
       </section>
-      <!-- / .section-->
-    </main>
 
-    <!-- App JS -->
+      <aside class="layer-panel" aria-label="Map presentation controls">
+        <div class="layer-panel__heading">
+          <span>Layers</span>
+          <button class="text-button" id="projection-toggle" type="button">
+            Globe
+          </button>
+        </div>
+        <label>
+          <input id="toggle-events" type="checkbox" checked />
+          <span
+            class="layer-swatch layer-swatch--events"
+            aria-hidden="true"
+          ></span>
+          Event points
+        </label>
+        <label>
+          <input id="toggle-heat" type="checkbox" checked />
+          <span
+            class="layer-swatch layer-swatch--heat"
+            aria-hidden="true"
+          ></span>
+          Heat field
+        </label>
+        <label>
+          <input id="toggle-plates" type="checkbox" checked />
+          <span
+            class="layer-swatch layer-swatch--plates"
+            aria-hidden="true"
+          ></span>
+          Tectonic plates
+        </label>
+        <div
+          class="magnitude-legend"
+          id="magnitude-legend"
+          aria-label="Magnitude legend"
+        ></div>
+        <p class="basemap-credit">
+          Basemap
+          <a href="https://openfreemap.org/" target="_blank" rel="noopener"
+            >OpenFreeMap</a
+          >
+          ·
+          <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener"
+            >OpenMapTiles</a
+          >
+          ·
+          <a
+            href="https://www.openstreetmap.org/copyright"
+            target="_blank"
+            rel="noopener"
+            >OpenStreetMap</a
+          >
+        </p>
+      </aside>
+
+      <aside
+        class="event-detail"
+        id="event-detail"
+        aria-labelledby="event-detail-title"
+        aria-live="polite"
+        hidden
+      >
+        <button
+          class="icon-button event-detail__close"
+          id="close-detail"
+          type="button"
+        >
+          <span aria-hidden="true">×</span>
+          <span class="visually-hidden">Close earthquake details</span>
+        </button>
+        <p class="event-detail__eyebrow">USGS observed event</p>
+        <div class="event-detail__headline">
+          <strong id="detail-magnitude">M—</strong>
+          <div>
+            <h2 id="event-detail-title">Select an earthquake</h2>
+            <p id="detail-time">—</p>
+          </div>
+        </div>
+        <dl class="event-facts">
+          <div>
+            <dt>Depth</dt>
+            <dd id="detail-depth">—</dd>
+          </div>
+          <div>
+            <dt>Review</dt>
+            <dd id="detail-status">—</dd>
+          </div>
+          <div>
+            <dt>Felt reports</dt>
+            <dd id="detail-felt">—</dd>
+          </div>
+          <div>
+            <dt>Significance</dt>
+            <dd id="detail-significance">—</dd>
+          </div>
+          <div>
+            <dt>Alert</dt>
+            <dd id="detail-alert">—</dd>
+          </div>
+          <div>
+            <dt>Coordinates</dt>
+            <dd id="detail-coordinates">—</dd>
+          </div>
+        </dl>
+        <a
+          class="source-link"
+          id="detail-source"
+          href="https://earthquake.usgs.gov/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open official USGS event <span aria-hidden="true">↗</span>
+        </a>
+      </aside>
+
+      <div class="map-message" id="map-message" role="status" hidden></div>
+
+      <section class="time-instrument" aria-labelledby="timeline-title">
+        <button
+          class="timeline-play"
+          id="timeline-play"
+          type="button"
+          aria-label="Play the 30-day earthquake timeline"
+          disabled
+        >
+          <span aria-hidden="true">▶</span>
+        </button>
+        <div class="timeline-copy">
+          <span id="timeline-title">Observed through</span>
+          <strong id="timeline-date">—</strong>
+        </div>
+        <div class="timeline-range">
+          <span id="timeline-start">—</span>
+          <input
+            id="timeline-scrubber"
+            type="range"
+            min="0"
+            max="29"
+            value="29"
+            aria-label="Observed-through date"
+            disabled
+          />
+          <span id="timeline-end">—</span>
+        </div>
+        <div class="timeline-window" id="timeline-window">7-day window</div>
+      </section>
+
+      <div class="source-dock">
+        <span>Observed data</span>
+        <a
+          href="https://earthquake.usgs.gov/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >USGS</a
+        >
+        <span aria-hidden="true">·</span>
+        <a href="./THIRD_PARTY_DATA.md">Data notes</a>
+        <span aria-hidden="true">·</span>
+        <a href="./wdc-usga-gov.html">Legacy Tableau WDC</a>
+      </div>
+    </main>
+    <noscript
+      >This interactive atlas requires JavaScript to load USGS earthquake
+      data.</noscript
+    >
     <script type="module" src="./static/js/app.js"></script>
   </body>
 </html>

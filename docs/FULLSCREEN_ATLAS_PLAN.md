@@ -100,7 +100,7 @@ The unlabeled 2020 monthly and malformed weekly snapshots are removed from the s
 1. Formatting passes for source, tests, documentation, HTML, and workflow files.
 2. Unit tests cover schema normalization, filtering, search, magnitude/depth buckets, timeline bounds, summaries, source-link allowlisting, live/fallback freshness labels, and deterministic focus selection.
 3. HTML contract tests cover full-screen landmark structure, semantic controls, persistent evidence labels, and removal of tutorial/embedded-Tableau content from the primary route.
-4. Production build emits MapLibre workers, the tectonic snapshot, the fallback snapshot, and no runtime GitHub URL.
+4. Production build bundles the MapLibre worker runtime, emits the tectonic and fallback snapshots, and contains no runtime GitHub URL.
 5. Browser QA covers a desktop viewport and a narrow mobile viewport, pointer selection, keyboard timeline use, panel collapse, empty filters, and console errors.
 6. `npm audit --audit-level=low` passes or any upstream advisory is recorded explicitly before publication.
 
