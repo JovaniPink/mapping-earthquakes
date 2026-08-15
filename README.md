@@ -48,7 +48,10 @@ Its companion
 [`significant_month.meta.json`](./static/data/significant_month.meta.json)
 records the exact source URL, retrieval time, USGS generation time, feature
 count, and SHA-256 digest. This fallback covers significant events only and is
-labeled that way in the interface.
+labeled that way in the interface. Before displaying fallback claims, the
+runtime cross-checks its source URL, generation and retrieval times, feature
+count, and digest shape against the bundled collection. The test gate verifies
+the SHA-256 digest against the exact committed bytes.
 
 Tectonic boundaries use the repository-owned
 [`PB2002_boundaries.json`](./static/data/PB2002_boundaries.json) snapshot. The
@@ -57,7 +60,8 @@ browser never retrieves this data from GitHub at runtime. See
 
 [OpenFreeMap](https://openfreemap.org/) supplies the no-key vector style and
 MapLibre GL JS renders the map. Their required OpenMapTiles and OpenStreetMap
-attributions remain visible in the Atlas layer panel.
+attributions, plus the MapLibre renderer credit, remain visible in the Atlas
+layer panel.
 
 ## Requirements
 

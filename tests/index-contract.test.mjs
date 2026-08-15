@@ -57,6 +57,7 @@ test('keeps evidence labels and official event navigation in the page contract',
 
 test('keeps visible attribution for the basemap stack', () => {
   assert.match(html, /href="https:\/\/openfreemap\.org\/"/);
+  assert.match(html, /href="https:\/\/maplibre\.org\/"/);
   assert.match(html, /href="https:\/\/www\.openmaptiles\.org\/"/);
   assert.match(html, /href="https:\/\/www\.openstreetmap\.org\/copyright"/);
 });

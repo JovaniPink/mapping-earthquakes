@@ -1,5 +1,7 @@
 export const LIVE_DATA_SOURCE =
   'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson';
+export const FALLBACK_DATA_SOURCE =
+  'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
 export const DATA_REQUEST_TIMEOUT_MS = 10_000;
 export const USGS_EVENT_ORIGIN = 'https://earthquake.usgs.gov';
 export const DAY_MS = 86_400_000;
@@ -109,17 +111,66 @@ export function normalizeFeatureCollection(payload) {
     throw new Error('Response is not a GeoJSON FeatureCollection');
   }
 
+  const generated = Number(payload?.metadata?.generated);
+  if (!Number.isFinite(generated) || generated <= 0) {
+    throw new Error('FeatureCollection is missing a valid generation time');
+  }
+
   const features = payload.features.map(normalizeFeature).filter(Boolean);
+  if (payload.features.length > 0 && features.length === 0) {
+    throw new Error('FeatureCollection contains no valid earthquake features');
+  }
+
   return {
     type: 'FeatureCollection',
     metadata: {
-      generated: Number(payload?.metadata?.generated) || null,
+      generated,
       title: String(payload?.metadata?.title || 'USGS earthquake feed'),
       sourceCount: payload.features.length,
       acceptedCount: features.length,
+      rejectedCount: payload.features.length - features.length,
     },
     features,
   };
+}
+
+export function validateFallbackReceipt(collection, receipt) {
+  const generatedAt = Date.parse(String(receipt?.generatedAt ?? ''));
+  const retrievedAt = Date.parse(String(receipt?.retrievedAt ?? ''));
+  const featureCount = Number(receipt?.featureCount);
+  const sha256 = String(receipt?.sha256 ?? '');
+
+  if (receipt?.sourceUrl !== FALLBACK_DATA_SOURCE) {
+    throw new Error('Fallback receipt has an unexpected source URL');
+  }
+  if (
+    !Number.isFinite(generatedAt) ||
+    generatedAt !== collection?.metadata?.generated
+  ) {
+    throw new Error('Fallback receipt generation time does not match');
+  }
+  if (!Number.isFinite(retrievedAt) || retrievedAt < generatedAt) {
+    throw new Error('Fallback receipt retrieval time is invalid');
+  }
+  if (
+    typeof receipt?.featureCount !== 'number' ||
+    !Number.isSafeInteger(featureCount) ||
+    featureCount < 0 ||
+    featureCount !== collection?.metadata?.sourceCount
+  ) {
+    throw new Error('Fallback receipt feature count does not match');
+  }
+  if (!/^[a-f0-9]{64}$/.test(sha256)) {
+    throw new Error('Fallback receipt SHA-256 is invalid');
+  }
+
+  return Object.freeze({
+    ...receipt,
+    featureCount,
+    generatedAt: new Date(generatedAt).toISOString(),
+    retrievedAt: new Date(retrievedAt).toISOString(),
+    sha256,
+  });
 }
 
 export function getMagnitudeColor(magnitude) {

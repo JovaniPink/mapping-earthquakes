@@ -50,7 +50,8 @@ The unlabeled 2020 monthly and malformed weekly snapshots are removed from the s
 - Parcel 2 remains the application bundler established by PR #159.
 - MapLibre GL JS replaces Leaflet and Bootstrap on the primary route.
 - OpenFreeMap's dark vector style is the no-key default basemap.
-- One GeoJSON source feeds three zoom-aware layers:
+- One normalized filtered collection updates the clustered-event and heatmap
+  sources that feed three zoom-aware layers:
   - clusters at world scale;
   - a magnitude-weighted heatmap below regional zoom; and
   - magnitude/depth encoded circles for inspectable events.

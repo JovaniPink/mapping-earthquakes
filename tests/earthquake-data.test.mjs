@@ -18,6 +18,7 @@ import {
   normalizeFeatureCollection,
   selectStrongest,
   summarizeFeatures,
+  validateFallbackReceipt,
 } from '../static/js/earthquake-data.js';
 
 const dataSources = createDataSources(
@@ -86,6 +87,21 @@ test('pairs the fallback bytes with a complete, internally consistent receipt', 
     createHash('sha256').update(snapshotBytes).digest('hex')
   );
   assert.ok(Date.parse(receipt.retrievedAt) >= Date.parse(receipt.generatedAt));
+
+  const validatedReceipt = validateFallbackReceipt(
+    normalizeFeatureCollection(snapshot),
+    receipt
+  );
+  assert.equal(validatedReceipt.featureCount, snapshot.features.length);
+  assert.equal(Object.isFrozen(validatedReceipt), true);
+  assert.throws(
+    () =>
+      validateFallbackReceipt(normalizeFeatureCollection(snapshot), {
+        ...receipt,
+        featureCount: receipt.featureCount + 1,
+      }),
+    /feature count does not match/
+  );
 });
 
 test('requires every bundled data URL', () => {
@@ -242,6 +258,7 @@ test('accepts and normalizes valid GeoJSON FeatureCollections', async () => {
   );
   assert.equal(result.features.length, 1);
   assert.equal(result.metadata.acceptedCount, 1);
+  assert.equal(result.metadata.rejectedCount, 0);
 });
 
 test('rejects HTTP, schema, and timeout failures with useful errors', async () => {
@@ -255,6 +272,20 @@ test('rejects HTTP, schema, and timeout failures with useful errors', async () =
   assert.throws(
     () => normalizeFeatureCollection({ type: 'Feature' }),
     /FeatureCollection/
+  );
+  assert.throws(
+    () =>
+      normalizeFeatureCollection({ type: 'FeatureCollection', features: [] }),
+    /generation time/
+  );
+  assert.throws(
+    () =>
+      normalizeFeatureCollection({
+        type: 'FeatureCollection',
+        metadata: { generated: Date.UTC(2026, 7, 15) },
+        features: [{ geometry: { type: 'Point', coordinates: [] } }],
+      }),
+    /no valid earthquake features/
   );
   await assert.rejects(
     fetchFeatureCollection(

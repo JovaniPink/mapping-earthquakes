@@ -15,6 +15,7 @@ import {
   getLegendEntries,
   selectStrongest,
   summarizeFeatures,
+  validateFallbackReceipt,
 } from './earthquake-data.js';
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/fiord';
@@ -163,6 +164,13 @@ function setLoadingState() {
   elements['feed-label'].textContent = 'Connecting to USGS';
   elements['feed-detail'].textContent = 'Requesting the latest monthly feed…';
   elements['refresh-data'].disabled = true;
+}
+
+function reportRejectedFeatures(collection, label) {
+  if (!collection.metadata.rejectedCount) return;
+  console.warn(
+    `${label} rejected ${collection.metadata.rejectedCount} malformed earthquake feature(s).`
+  );
 }
 
 function setMapMessage(message) {
@@ -365,8 +373,9 @@ async function loadData({ silent = false } = {}) {
     const collection = await fetchFeatureCollection(
       dataSources.liveEarthquakes
     );
+    reportRejectedFeatures(collection, 'Live USGS feed');
     state.allFeatures = collection.features;
-    state.feedGeneratedAt = collection.metadata.generated || Date.now();
+    state.feedGeneratedAt = collection.metadata.generated;
     state.mode = 'live';
     state.snapshotMetadata = null;
     state.timelineIndex = 29;
@@ -382,10 +391,11 @@ async function loadData({ silent = false } = {}) {
         fetchFeatureCollection(dataSources.fallbackSnapshot),
         fetchJson(dataSources.fallbackMetadata),
       ]);
+      reportRejectedFeatures(collection, 'Bundled USGS fallback');
+      const receipt = validateFallbackReceipt(collection, metadata);
       state.allFeatures = collection.features;
-      state.snapshotMetadata = metadata;
-      state.feedGeneratedAt =
-        collection.metadata.generated || Date.parse(metadata.generatedAt);
+      state.snapshotMetadata = receipt;
+      state.feedGeneratedAt = collection.metadata.generated;
       state.mode = 'fallback';
       state.timelineIndex = 29;
       setFeedState('fallback');

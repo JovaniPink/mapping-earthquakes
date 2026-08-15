@@ -3,8 +3,8 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const SOURCE_URL =
-  'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson';
+import { FALLBACK_DATA_SOURCE as SOURCE_URL } from '../static/js/earthquake-data.js';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotPath = resolve(root, 'static/data/significant_month.geojson');
 const metadataPath = resolve(root, 'static/data/significant_month.meta.json');
