@@ -65,6 +65,10 @@ test('escapes external feed values before rendering popup HTML', () => {
     getEarthquakePopup({ properties: { mag: 4.5, place: '<b>Unsafe</b>' } }),
     '<strong>Magnitude:</strong> 4.5<br><strong>Location:</strong> &lt;b&gt;Unsafe&lt;/b&gt;'
   );
+  assert.equal(
+    getEarthquakePopup({ properties: { mag: null, place: 'Test Ridge' } }),
+    '<strong>Magnitude:</strong> Unknown<br><strong>Location:</strong> Test Ridge'
+  );
 });
 
 test('accepts valid GeoJSON FeatureCollections', async () => {

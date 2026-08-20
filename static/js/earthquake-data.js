@@ -66,7 +66,8 @@ export function escapeHtml(value) {
 }
 
 export function getEarthquakePopup(feature) {
-  const magnitude = Number(feature?.properties?.mag);
+  const rawMagnitude = feature?.properties?.mag;
+  const magnitude = rawMagnitude == null ? Number.NaN : Number(rawMagnitude);
   const displayMagnitude = Number.isFinite(magnitude) ? magnitude : 'Unknown';
   const place = feature?.properties?.place || 'Unknown location';
 

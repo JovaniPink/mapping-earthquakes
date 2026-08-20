@@ -41,6 +41,14 @@ test('social metadata uses valid public contracts', () => {
     html,
     /verification_token|property="fb:app_id" content=""/
   );
+  assert.match(
+    html,
+    /property="og:image"\s+content="\.\/static\/images\/social\.png"/
+  );
+  assert.match(
+    html,
+    /name="twitter:image"\s+content="\.\/static\/images\/social\.png"/
+  );
 });
 
 test('uses a web-sized, dimensioned navigation image', () => {

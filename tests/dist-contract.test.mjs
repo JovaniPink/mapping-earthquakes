@@ -53,3 +53,29 @@ test('ships one web-sized navigation image', async () => {
     `expected navigation image under 100 KiB, received ${metadata.size} bytes`
   );
 });
+
+test('ships the social preview referenced by the built page', async () => {
+  const files = await listFiles(fileURLToPath(distDirectory));
+  const socialImages = files.filter(
+    (filename) =>
+      path.basename(filename).startsWith('social.') && filename.endsWith('.png')
+  );
+
+  assert.equal(socialImages.length, 1);
+  const builtHtml = await readFile(
+    new URL('index.html', distDirectory),
+    'utf8'
+  );
+  const emittedPath = path
+    .relative(fileURLToPath(distDirectory), socialImages[0])
+    .split(path.sep)
+    .join('/');
+  assert.ok(
+    builtHtml.includes(emittedPath),
+    `expected built HTML to reference ${emittedPath}`
+  );
+  assert.doesNotMatch(
+    builtHtml,
+    /mapping-earthquakes\.netlify\.app\/static\/images\/social\.png/
+  );
+});
