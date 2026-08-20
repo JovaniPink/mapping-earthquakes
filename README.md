@@ -41,6 +41,13 @@ The runtime requests the official
 USGS says its real-time GeoJSON feeds are the preferred source for automated
 displays and that they update every minute. The request has a ten-second timeout
 and the payload is schema-checked before any feature reaches the map or metrics.
+Missing required coordinates, depth, magnitude, or time values are rejected;
+missing optional observations such as felt-report counts remain unknown rather
+than being presented as zero.
+
+The one-minute background refresh preserves the visitor's filters and timeline
+position. If USGS revises an event with the same ID, an open detail sheet is
+rebound to the latest accepted feature instead of retaining stale values.
 
 If that request fails, the app loads the repository-owned
 [`significant_month.geojson`](./static/data/significant_month.geojson) snapshot.

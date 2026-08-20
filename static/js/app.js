@@ -10,9 +10,11 @@ import {
   createDataSources,
   fetchFeatureCollection,
   fetchJson,
+  findFeatureById,
   filterFeatures,
   getFeedStatus,
   getLegendEntries,
+  getRefreshTimelineIndex,
   selectStrongest,
   summarizeFeatures,
   validateFallbackReceipt,
@@ -293,11 +295,16 @@ function applyFilters() {
     query: elements['place-search'].value,
   });
 
-  if (
-    state.selectedId &&
-    !state.filteredFeatures.some(({ id }) => id === state.selectedId)
-  ) {
-    closeDetail();
+  if (state.selectedId) {
+    const selectedFeature = findFeatureById(
+      state.filteredFeatures,
+      state.selectedId
+    );
+    if (selectedFeature) {
+      selectEvent(selectedFeature, { moveMap: false });
+    } else {
+      closeDetail();
+    }
   }
 
   updateMapSources();
@@ -378,7 +385,9 @@ async function loadData({ silent = false } = {}) {
     state.feedGeneratedAt = collection.metadata.generated;
     state.mode = 'live';
     state.snapshotMetadata = null;
-    state.timelineIndex = 29;
+    state.timelineIndex = getRefreshTimelineIndex(state.timelineIndex, {
+      silent,
+    });
     setFeedState('live');
     elements['panel-notice'].hidden = true;
   } catch (liveError) {
@@ -397,7 +406,9 @@ async function loadData({ silent = false } = {}) {
       state.snapshotMetadata = receipt;
       state.feedGeneratedAt = collection.metadata.generated;
       state.mode = 'fallback';
-      state.timelineIndex = 29;
+      state.timelineIndex = getRefreshTimelineIndex(state.timelineIndex, {
+        silent,
+      });
       setFeedState('fallback');
       elements['panel-notice'].textContent =
         'The live monthly feed is unavailable. The map is showing a narrower, committed snapshot of significant events only.';
@@ -667,6 +678,20 @@ function setLayerVisibility(layerIds, visible) {
   });
 }
 
+function syncLayerVisibilityControls() {
+  setLayerVisibility(
+    [
+      'event-clusters',
+      'event-cluster-count',
+      'event-points',
+      'selected-event-halo',
+    ],
+    elements['toggle-events'].checked
+  );
+  setLayerVisibility(['earthquake-heat'], elements['toggle-heat'].checked);
+  setLayerVisibility(['tectonic-lines'], elements['toggle-plates'].checked);
+}
+
 function stopPlayback() {
   if (state.playbackId) window.clearInterval(state.playbackId);
   state.playbackId = null;
@@ -760,22 +785,17 @@ function bindControls() {
       ? 'Mercator'
       : 'Globe';
   });
-  elements['toggle-events'].addEventListener('change', () =>
-    setLayerVisibility(
-      [
-        'event-clusters',
-        'event-cluster-count',
-        'event-points',
-        'selected-event-halo',
-      ],
-      elements['toggle-events'].checked
-    )
+  elements['toggle-events'].addEventListener(
+    'change',
+    syncLayerVisibilityControls
   );
-  elements['toggle-heat'].addEventListener('change', () =>
-    setLayerVisibility(['earthquake-heat'], elements['toggle-heat'].checked)
+  elements['toggle-heat'].addEventListener(
+    'change',
+    syncLayerVisibilityControls
   );
-  elements['toggle-plates'].addEventListener('change', () =>
-    setLayerVisibility(['tectonic-lines'], elements['toggle-plates'].checked)
+  elements['toggle-plates'].addEventListener(
+    'change',
+    syncLayerVisibilityControls
   );
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') closeDetail();
@@ -802,6 +822,7 @@ map.on('load', () => {
     ? 'Mercator'
     : 'Globe';
   addEarthquakeLayers();
+  syncLayerVisibilityControls();
   bindMapInteractions();
   applyFilters();
   setMapMessage('');

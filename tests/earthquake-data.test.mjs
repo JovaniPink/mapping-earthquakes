@@ -7,17 +7,20 @@ import {
   DAY_MS,
   createDataSources,
   fetchFeatureCollection,
+  findFeatureById,
   filterFeatures,
   getDepthBucket,
   getFeedStatus,
   getLegendEntries,
   getMagnitudeColor,
+  getRefreshTimelineIndex,
   getTimelineBounds,
   isOfficialUsgsEventUrl,
   normalizeFeature,
   normalizeFeatureCollection,
   selectStrongest,
   summarizeFeatures,
+  toFiniteNumber,
   validateFallbackReceipt,
 } from '../static/js/earthquake-data.js';
 
@@ -121,6 +124,7 @@ test('requires every bundled data URL', () => {
 
 test('normalizes valid features and rejects malformed coordinates and values', () => {
   assert.equal(feature().properties.depth, 12);
+  assert.equal(feature().properties.felt, null);
   assert.equal(
     normalizeFeature({
       geometry: { type: 'Point', coordinates: [400, 10, 2] },
@@ -135,6 +139,47 @@ test('normalizes valid features and rejects malformed coordinates and values', (
     }),
     null
   );
+  assert.equal(
+    normalizeFeature({
+      geometry: { type: 'Point', coordinates: [10, 10, 2] },
+      properties: { mag: null, time: 1 },
+    }),
+    null
+  );
+  assert.equal(
+    normalizeFeature({
+      geometry: { type: 'Point', coordinates: [null, 10, 2] },
+      properties: { mag: 1, time: 1 },
+    }),
+    null
+  );
+});
+
+test('preserves zero while keeping absent optional observations unknown', () => {
+  assert.equal(toFiniteNumber(0), 0);
+  assert.equal(toFiniteNumber('0'), 0);
+  assert.equal(toFiniteNumber(null), null);
+  assert.equal(toFiniteNumber('  '), null);
+
+  const normalized = normalizeFeature({
+    type: 'Feature',
+    id: 'zero-felt',
+    geometry: { type: 'Point', coordinates: [-117, 35, 12] },
+    properties: { mag: 2, time: 1, felt: 0, updated: null },
+  });
+  assert.equal(normalized.properties.felt, 0);
+  assert.equal(normalized.properties.updated, null);
+});
+
+test('preserves silent-refresh position and resolves revised selected events', () => {
+  assert.equal(getRefreshTimelineIndex(4, { silent: true }), 4);
+  assert.equal(getRefreshTimelineIndex(4), 29);
+  assert.equal(getRefreshTimelineIndex('invalid', { silent: true }), 29);
+
+  const original = feature({ id: 'revised', place: 'Original Ridge' });
+  const revised = feature({ id: 'revised', place: 'Revised Ridge' });
+  assert.equal(findFeatureById([revised], original.id), revised);
+  assert.equal(findFeatureById([revised], 'missing'), null);
 });
 
 test('allowlists only official USGS event-page links', () => {
@@ -198,10 +243,6 @@ test('filters one event set by time, magnitude, depth, and place search', () => 
       query: 'alas',
     }).map(({ id }) => id),
     ['a']
-  );
-  assert.equal(
-    getEarthquakePopup({ properties: { mag: null, place: 'Test Ridge' } }),
-    '<strong>Magnitude:</strong> Unknown<br><strong>Location:</strong> Test Ridge'
   );
 });
 

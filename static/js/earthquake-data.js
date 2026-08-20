@@ -39,6 +39,18 @@ export function isFeatureCollection(payload) {
   );
 }
 
+export function toFiniteNumber(value) {
+  if (
+    value == null ||
+    (typeof value === 'string' && value.trim().length === 0)
+  ) {
+    return null;
+  }
+
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
 export function isOfficialUsgsEventUrl(value) {
   try {
     const url = new URL(String(value ?? ''));
@@ -53,11 +65,11 @@ export function isOfficialUsgsEventUrl(value) {
 
 export function normalizeFeature(feature) {
   const coordinates = feature?.geometry?.coordinates;
-  const longitude = Number(coordinates?.[0]);
-  const latitude = Number(coordinates?.[1]);
-  const depth = Number(coordinates?.[2]);
-  const magnitude = Number(feature?.properties?.mag);
-  const time = Number(feature?.properties?.time);
+  const longitude = toFiniteNumber(coordinates?.[0]);
+  const latitude = toFiniteNumber(coordinates?.[1]);
+  const depth = toFiniteNumber(coordinates?.[2]);
+  const magnitude = toFiniteNumber(feature?.properties?.mag);
+  const time = toFiniteNumber(feature?.properties?.time);
 
   if (
     feature?.geometry?.type !== 'Point' ||
@@ -86,14 +98,10 @@ export function normalizeFeature(feature) {
       mag: magnitude,
       place: String(properties.place || 'Unknown location'),
       time,
-      updated: Number.isFinite(Number(properties.updated))
-        ? Number(properties.updated)
-        : null,
+      updated: toFiniteNumber(properties.updated),
       depth,
-      felt: Number.isFinite(Number(properties.felt))
-        ? Number(properties.felt)
-        : null,
-      sig: Number.isFinite(Number(properties.sig)) ? Number(properties.sig) : 0,
+      felt: toFiniteNumber(properties.felt),
+      sig: toFiniteNumber(properties.sig) ?? 0,
       alert: ['green', 'yellow', 'orange', 'red'].includes(properties.alert)
         ? properties.alert
         : null,
@@ -132,6 +140,18 @@ export function normalizeFeatureCollection(payload) {
     },
     features,
   };
+}
+
+export function getRefreshTimelineIndex(currentIndex, { silent = false } = {}) {
+  const index = toFiniteNumber(currentIndex);
+  return silent && Number.isInteger(index) && index >= 0 && index <= 29
+    ? index
+    : 29;
+}
+
+export function findFeatureById(features, selectedId) {
+  if (selectedId == null || !Array.isArray(features)) return null;
+  return features.find(({ id }) => id === selectedId) ?? null;
 }
 
 export function validateFallbackReceipt(collection, receipt) {
