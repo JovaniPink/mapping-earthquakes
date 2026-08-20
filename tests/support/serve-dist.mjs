@@ -3,8 +3,10 @@ import { readFile, stat } from 'node:fs/promises';
 import { extname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const host = '127.0.0.1';
-const port = Number(process.env.ATLAS_TEST_PORT || 4173);
+import { ATLAS_TEST_HOST, atlasTestPort } from './test-server.mjs';
+
+const host = ATLAS_TEST_HOST;
+const port = atlasTestPort;
 const distDirectory = fileURLToPath(new URL('../../dist/', import.meta.url));
 const distPrefix = `${resolve(distDirectory)}${sep}`;
 const contentTypes = new Map([

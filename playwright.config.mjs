@@ -1,7 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-const port = 4173;
-const baseURL = `http://127.0.0.1:${port}`;
+import { atlasTestOrigin } from './tests/support/test-server.mjs';
 
 export default defineConfig({
   testDir: './tests/browser',
@@ -12,7 +11,7 @@ export default defineConfig({
   expect: { timeout: 5_000 },
   reporter: process.env.CI ? 'line' : 'list',
   use: {
-    baseURL,
+    baseURL: atlasTestOrigin,
     browserName: 'chromium',
     headless: true,
     locale: 'en-US',
@@ -25,7 +24,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'node tests/support/serve-dist.mjs',
-    url: baseURL,
+    url: atlasTestOrigin,
     reuseExistingServer: false,
     timeout: 10_000,
   },

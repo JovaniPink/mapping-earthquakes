@@ -26,6 +26,31 @@ test('selecting a fixture event opens its observed-event detail', async ({
   browser.assertClean();
 });
 
+test('refreshing an open event replaces stale details for the same USGS id', async ({
+  page,
+}) => {
+  const browser = await openAtlas(page, {
+    liveFeed: 'revised-on-refresh',
+  });
+
+  await page
+    .locator('#event-list button', { hasText: 'Browser Fixture Ridge' })
+    .click();
+  await expect(page.locator('#event-detail-title')).toHaveText(
+    'Browser Fixture Ridge'
+  );
+
+  await page.locator('#refresh-data').click();
+
+  await expect(page.locator('#event-detail-title')).toHaveText(
+    'Revised Browser Fixture Ridge'
+  );
+  await expect(page.locator('#detail-magnitude')).toHaveText('M6.7');
+  await expect(page.locator('#detail-felt')).toHaveText('84');
+  expect(browser.liveRequestCount).toBe(2);
+  browser.assertClean();
+});
+
 test('a filter with no matching observations renders an explicit empty state', async ({
   page,
 }) => {
