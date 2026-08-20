@@ -7,7 +7,7 @@
     "url": "git+https://github.com/JovaniPink/mapping-earthquakes"
   },
   "homepage": "https://github.com/JovaniPink/mapping-earthquakes#readme",
-  "packageManager": "npm@11.12.1",
+  "packageManager": "npm@11.19.0",
   "type": "module",
   "scripts": {
     "dev": "parcel index.html",
