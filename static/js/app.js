@@ -78,6 +78,7 @@ const elements = Object.fromEntries(
     'timeline-end',
     'timeline-scrubber',
     'timeline-window',
+    'earthquake-map',
   ].map((id) => [id, document.getElementById(id)])
 );
 
@@ -809,6 +810,7 @@ function bindControls() {
 
 map.on('load', () => {
   state.mapReady = true;
+  elements['earthquake-map'].dataset.ready = 'true';
   try {
     map.setProjection({ type: 'globe' });
   } catch (error) {

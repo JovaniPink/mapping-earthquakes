@@ -79,7 +79,10 @@ export async function openAtlas(page, { liveFeed = 'fixture' } = {}) {
   await expect(page.locator('#feed-label')).not.toHaveText(
     'Connecting to USGS'
   );
-  await page.waitForLoadState('networkidle');
+  await expect(page.locator('#earthquake-map')).toHaveAttribute(
+    'data-ready',
+    'true'
+  );
 
   return {
     get liveRequestCount() {

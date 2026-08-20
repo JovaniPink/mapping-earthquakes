@@ -129,8 +129,10 @@ For a dependency-security check, run
 `corepack npm install-scripts ls` should report no unreviewed install scripts.
 
 Browser tests intercept the live USGS feed and external basemap with committed,
-offline fixtures. They start a local server on port 4173 by default; use one
-shared override when that port is occupied:
+offline fixtures. The browser helper waits for the Atlas's explicit MapLibre load
+marker and feed evidence rather than global network idleness, which can remain
+active while map workers are alive. The tests start a local server on port 4173 by
+default; use one shared override when that port is occupied:
 
 ```sh
 ATLAS_TEST_PORT=44173 corepack npm run test:browser
