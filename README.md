@@ -97,6 +97,7 @@ Parcel prints the local development URL after it starts.
 | `npm run format:check` | Check source, workflow, data metadata, tests, and docs.        |
 | `npm run test:unit`    | Test data, evidence, filtering, and HTML contracts.            |
 | `npm run test:dist`    | Verify the generated data and JavaScript assets.               |
+| `npm run test:browser` | Exercise the built Atlas against offline browser fixtures.     |
 | `npm test`             | Run formatting, unit tests, build, and artifact checks.        |
 
 Refreshing the snapshot is an intentional source update. Review both generated
@@ -110,6 +111,14 @@ git diff -- static/data/significant_month.geojson static/data/significant_month.
 For a dependency-security check, run `npm audit --audit-level=low` after
 `npm ci`.
 
+Browser tests intercept the live USGS feed and external basemap with committed,
+offline fixtures. They start a local server on port 4173 by default; use one
+shared override when that port is occupied:
+
+```sh
+ATLAS_TEST_PORT=44173 npm run test:browser
+```
+
 ## Project structure
 
 ```text
@@ -121,7 +130,7 @@ For a dependency-security check, run `npm audit --audit-level=low` after
 ├── static/js/app.js                  # MapLibre runtime and UI interactions
 ├── static/js/earthquake-data.js      # Pure data and evidence contracts
 ├── static/scss/app.scss              # Full-screen responsive presentation
-├── tests/                            # Data, HTML, and built-artifact contracts
+├── tests/                            # Unit, artifact, and offline browser contracts
 ├── THIRD_PARTY_DATA.md               # Dataset provenance and licensing
 └── .github/workflows/api.yml         # Install, test, build, and audit checks
 ```
@@ -150,7 +159,7 @@ decision.
 
 ## Roadmap
 
-- Add browser automation for map selection, empty filters, and fallback mode.
+- Extend browser coverage to clustered map selection and layer visibility.
 - Add ShakeMap intensity products as a separately sourced observed-data layer.
 - Keep any future hypothetical earthquake and response-agent experience in a
   separately labeled Signal Room simulation rather than mixing it with this

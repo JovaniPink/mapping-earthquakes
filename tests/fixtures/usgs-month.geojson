@@ -1,0 +1,97 @@
+{
+  "type": "FeatureCollection",
+  "metadata": {
+    "generated": 1786795200000,
+    "title": "Synthetic browser-test earthquake fixture"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "id": "test-fixture-ridge",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-149.9, 61.2, 18.4]
+      },
+      "properties": {
+        "mag": 6.4,
+        "place": "Browser Fixture Ridge",
+        "time": 1786795200000,
+        "updated": 1786795500000,
+        "felt": 42,
+        "sig": 630,
+        "alert": "green",
+        "tsunami": 0,
+        "status": "reviewed",
+        "magType": "mw",
+        "title": "M 6.4 - Browser Fixture Ridge",
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/test-fixture-ridge"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "test-fixture-basin",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [139.7, 35.6, 320]
+      },
+      "properties": {
+        "mag": 5.1,
+        "place": "Browser Fixture Basin",
+        "time": 1786622400000,
+        "updated": 1786622700000,
+        "felt": null,
+        "sig": 410,
+        "alert": null,
+        "tsunami": 0,
+        "status": "automatic",
+        "magType": "mww",
+        "title": "M 5.1 - Browser Fixture Basin",
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/test-fixture-basin"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "test-fixture-shelf",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [178.1, -38.7, 44]
+      },
+      "properties": {
+        "mag": 4.3,
+        "place": "Browser Fixture Shelf",
+        "time": 1785931200000,
+        "updated": 1785931500000,
+        "felt": 3,
+        "sig": 280,
+        "alert": null,
+        "tsunami": 0,
+        "status": "reviewed",
+        "magType": "mb",
+        "title": "M 4.3 - Browser Fixture Shelf",
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/test-fixture-shelf"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "test-fixture-coast",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-72.4, -36.1, 55]
+      },
+      "properties": {
+        "mag": 3.8,
+        "place": "Keyboard Fixture Coast",
+        "time": 1784289600000,
+        "updated": 1784289900000,
+        "felt": 1,
+        "sig": 190,
+        "alert": null,
+        "tsunami": 0,
+        "status": "reviewed",
+        "magType": "ml",
+        "title": "M 3.8 - Keyboard Fixture Coast",
+        "url": "https://earthquake.usgs.gov/earthquakes/eventpage/test-fixture-coast"
+      }
+    }
+  ]
+}

@@ -12,10 +12,11 @@
   "scripts": {
     "dev": "parcel index.html",
     "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && parcel build index.html --dist-dir dist --public-url ./ --no-cache",
-    "format:check": "prettier --check README.md THIRD_PARTY_DATA.md docs/*.md .github/workflows/api.yml index.html wdc-usga-gov.html static/js/app.js static/js/earthquake-data.js static/scss/app.scss scripts/*.mjs tests/*.test.mjs && prettier --check .parcelrc static/data/significant_month.meta.json --parser json",
+    "format:check": "prettier --check README.md THIRD_PARTY_DATA.md docs/*.md .github/workflows/api.yml index.html wdc-usga-gov.html static/js/app.js static/js/earthquake-data.js static/scss/app.scss scripts/*.mjs playwright.config.mjs tests/*.test.mjs tests/browser/*.test.mjs tests/fixtures/*.md tests/support/*.mjs && prettier --check .parcelrc static/data/significant_month.meta.json tests/fixtures/*.geojson --parser json",
     "data:refresh": "node scripts/refresh-usgs-snapshot.mjs",
-    "test:unit": "node --test tests/earthquake-data.test.mjs tests/index-contract.test.mjs",
+    "test:unit": "node --test tests/earthquake-data.test.mjs tests/index-contract.test.mjs tests/test-server.test.mjs",
     "test:dist": "node --test tests/dist-contract.test.mjs",
+    "test:browser": "playwright test",
     "test": "npm run format:check && npm run test:unit && npm run build && npm run test:dist"
   },
   "keywords": [
@@ -36,6 +37,7 @@
     "@parcel/transformer-raw": "^2.16.4",
     "@parcel/transformer-sass": "^2.16.4",
     "@parcel/transformer-webmanifest": "^2.16.4",
+    "@playwright/test": "1.62.1",
     "parcel": "2.16.4",
     "prettier": "3.9.6",
     "sass": "1.102.0"
