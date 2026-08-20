@@ -1,58 +1,81 @@
-# Mapping Earthquakes
+# Earthquake Atlas
 
-An interactive Leaflet project for exploring recent earthquakes, magnitude 4.5+
-events, and tectonic plate boundaries alongside smaller map demonstrations.
+Earthquake Atlas is a full-screen observed-data explorer for the latest month of
+earthquakes reported by the U.S. Geological Survey. It pairs a MapLibre globe
+with search, magnitude and depth filters, a 30-day timeline, tectonic plate
+boundaries, and source-linked event details.
 
-![Earth viewed from space](./resources/earth.jpg)
+The primary route is an atlas, not a forecast or simulation. Every earthquake
+shown comes from an official USGS feed or from a clearly labeled, narrower USGS
+fallback snapshot.
 
-Photo by [NASA](https://unsplash.com/@nasa) on
-[Unsplash](https://unsplash.com/s/photos/earth-quakes).
+View the [deployed site](https://mapping-earthquakes.netlify.app/). The existing
+deployment will not contain this redesign until its pull request is reviewed,
+merged, and deployed.
 
-## What the site includes
+## Experience
 
-- A single-location Leaflet example centered on Orlando, Florida.
-- A multi-city example whose marker size represents population.
-- An earthquake map with selectable Mapbox base maps and overlay controls.
-- Magnitude-sized and color-coded markers with location details in popups.
-- Separate overlays for all earthquakes, major earthquakes, and tectonic plate
-  boundaries.
-- An embedded Tableau earthquake visualization.
-- A noindex legacy Tableau WDC 2.x compatibility page for older workbooks.
+- A true edge-to-edge dark map with floating, responsive controls.
+- Live status based on the USGS feed's own generation timestamp.
+- Search plus magnitude, depth, observation-window, and observed-through-date
+  controls over one shared event collection.
+- A magnitude-weighted heat field, world-scale clusters, event points, and a
+  separate tectonic-boundary layer.
+- A deterministic `Focus strongest` action and a source-linked event detail
+  sheet.
+- Globe and Mercator projections, full-screen map controls, and reduced-motion
+  behavior.
+- An explicitly labeled significant-events fallback when the complete live
+  monthly feed cannot be reached.
 
-View the [deployed site](https://mapping-earthquakes.netlify.app/) or the
-[Tableau visualization](https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes).
+The product and interaction decisions are recorded in
+[`docs/FULLSCREEN_ATLAS_PLAN.md`](./docs/FULLSCREEN_ATLAS_PLAN.md). The legacy
+Tableau WDC 2.x compatibility page remains separately available at
+[`wdc-usga-gov.html`](./wdc-usga-gov.html); it is not part of the primary atlas
+experience.
 
-## Data sources
+## Data and maps
 
-The browser loads GeoJSON directly from these external sources:
+The runtime requests the official
+[USGS all-earthquakes, past 30 days GeoJSON feed](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson).
+USGS says its real-time GeoJSON feeds are the preferred source for automated
+displays and that they update every minute. The request has a ten-second timeout
+and the payload is schema-checked before any feature reaches the map or metrics.
+Missing required coordinates, depth, magnitude, or time values are rejected;
+missing optional observations such as felt-report counts remain unknown rather
+than being presented as zero.
 
-- [USGS all-earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson)
-- [USGS magnitude 4.5+ earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson)
+The one-minute background refresh preserves the visitor's filters and timeline
+position. If USGS revises an event with the same ID, an open detail sheet is
+rebound to the latest accepted feature instead of retaining stale values.
 
-The USGS feeds update every minute and change independently of this repository.
-Each request has a ten-second timeout, and the interface reports individual
-layer failures while leaving healthy layers interactive.
+If that request fails, the app loads the repository-owned
+[`significant_month.geojson`](./static/data/significant_month.geojson) snapshot.
+Its companion
+[`significant_month.meta.json`](./static/data/significant_month.meta.json)
+records the exact source URL, retrieval time, USGS generation time, feature
+count, and SHA-256 digest. This fallback covers significant events only and is
+labeled that way in the interface. Before displaying fallback claims, the
+runtime cross-checks its source URL, generation and retrieval times, feature
+count, and digest shape against the bundled collection. The test gate verifies
+the SHA-256 digest against the exact committed bytes.
 
 Tectonic boundaries use the repository-owned
-[`static/data/PB2002_boundaries.json`](./static/data/PB2002_boundaries.json)
-snapshot instead of a runtime request to GitHub. It is structurally equal to the
-current upstream GeoJSON and is bundled by Parcel as a versioned build asset.
-The dataset comes from Hugo Ahlenius/Nordpil's conversion of Peter Bird's plate
-model and is available under the Open Data Commons Attribution License. See
+[`PB2002_boundaries.json`](./static/data/PB2002_boundaries.json) snapshot. The
+browser never retrieves this data from GitHub at runtime. See
 [`THIRD_PARTY_DATA.md`](./THIRD_PARTY_DATA.md) for provenance and attribution.
+
+[OpenFreeMap](https://openfreemap.org/) supplies the no-key vector style and
+MapLibre GL JS renders the map. Their required OpenMapTiles and OpenStreetMap
+attributions, plus the MapLibre renderer credit, remain visible in the Atlas
+layer panel.
 
 ## Requirements
 
 - Node.js 24 (see [`.nvmrc`](./.nvmrc))
 - npm 11
-- An optional Mapbox public access token for the additional base-map styles
 
-OpenStreetMap is the default base layer, so the application runs without a
-Mapbox token. When supplied, the `API_KEY` value is compiled into browser
-JavaScript and is visible to visitors. Use a separate, URL-restricted public
-token with only the scopes needed to read styles and tiles. Never use a
-secret-scoped token in this project. See
-[Mapbox access-token guidance](https://docs.mapbox.com/accounts/guides/tokens/).
+No API key or secret is required.
 
 ## Local development
 
@@ -62,20 +85,27 @@ npm ci
 npm run dev
 ```
 
-To enable the optional Mapbox styles, copy `.env.example` to `.env` and replace
-its placeholder token, or export `API_KEY` before starting Parcel. Parcel prints
-the local development URL after it starts.
+Parcel prints the local development URL after it starts.
 
 ## Commands
 
-| Command                | Purpose                                            |
-| ---------------------- | -------------------------------------------------- |
-| `npm run dev`          | Start the Parcel development server.               |
-| `npm run build`        | Create an optimized production bundle in `dist/`.  |
-| `npm run format:check` | Check source, workflow, and README formatting.     |
-| `npm run test:unit`    | Test feed, styling, popup, and schema contracts.   |
-| `npm run test:dist`    | Verify the generated data and JavaScript assets.   |
-| `npm test`             | Run formatting, tests, build, and artifact checks. |
+| Command                | Purpose                                                        |
+| ---------------------- | -------------------------------------------------------------- |
+| `npm run dev`          | Start the Parcel development server.                           |
+| `npm run build`        | Create an optimized production bundle in `dist/`.              |
+| `npm run data:refresh` | Refresh the labeled USGS significant-month fallback + receipt. |
+| `npm run format:check` | Check source, workflow, data metadata, tests, and docs.        |
+| `npm run test:unit`    | Test data, evidence, filtering, and HTML contracts.            |
+| `npm run test:dist`    | Verify the generated data and JavaScript assets.               |
+| `npm test`             | Run formatting, unit tests, build, and artifact checks.        |
+
+Refreshing the snapshot is an intentional source update. Review both generated
+files and their receipt before committing them:
+
+```sh
+npm run data:refresh
+git diff -- static/data/significant_month.geojson static/data/significant_month.meta.json
+```
 
 For a dependency-security check, run `npm audit --audit-level=low` after
 `npm ci`.
@@ -84,75 +114,52 @@ For a dependency-security check, run `npm audit --audit-level=low` after
 
 ```text
 .
-├── index.html                 # Page structure and metadata
-├── resources/                # Images and reference data
-├── static/data/               # Bundled tectonic-plate snapshot
-├── static/images/             # Web-sized interface and social assets
-├── static/js/app.js          # Leaflet maps and browser integration
-├── static/js/earthquake-data.js # Feed URLs and testable data contracts
-├── static/scss/app.scss      # Site styles
-├── tests/                    # Node unit tests
-├── THIRD_PARTY_DATA.md       # Dataset provenance and licensing
-├── .parcelrc                 # Raw JSON asset pipeline
-└── .github/workflows/api.yml # Install, formatting, and build checks
+├── docs/FULLSCREEN_ATLAS_PLAN.md     # Product, data, and validation plan
+├── index.html                        # Accessible full-screen shell
+├── scripts/refresh-usgs-snapshot.mjs # Bounded USGS refresh + SHA-256 receipt
+├── static/data/                      # Bundled fallback and tectonic snapshots
+├── static/js/app.js                  # MapLibre runtime and UI interactions
+├── static/js/earthquake-data.js      # Pure data and evidence contracts
+├── static/scss/app.scss              # Full-screen responsive presentation
+├── tests/                            # Data, HTML, and built-artifact contracts
+├── THIRD_PARTY_DATA.md               # Dataset provenance and licensing
+└── .github/workflows/api.yml         # Install, test, build, and audit checks
 ```
-
-Leaflet renders the maps, OpenStreetMap supplies the default tiles, and optional
-Mapbox styles are enabled when Parcel injects `API_KEY` at build time. Parcel
-emits the local tectonic dataset as a content-addressed build asset. The browser
-Fetch API loads each GeoJSON overlay independently with bounded request times.
-External feed values are escaped before they are rendered in popup HTML.
-The decorative sidebar image is a 512-pixel WebP rather than the original
-multi-megabyte source, and explicit dimensions reserve its layout space before
-the asset loads.
 
 ## Validation and deployment
 
 Pull requests are expected to pass `npm test` and
-`npm audit --audit-level=low` on the Node version in `.nvmrc`. CI does not need
-a Mapbox token because OpenStreetMap is the runtime fallback. Preview and
-production hosts may provide a URL-restricted public token for the optional
-Mapbox layers.
+`npm audit --audit-level=low` on the Node version in `.nvmrc`. The production
+bundle includes the tectonic and significant-event fallback files. A successful
+build proves that the application compiles; it does not prove that the live
+USGS feed or the external basemap is currently reachable.
 
 For a static host such as Netlify, use:
 
 - Build command: `npm run build`
 - Publish directory: `dist`
-- Optional environment variable: `API_KEY` set to a restricted public Mapbox
-  token
-
-The application depends on live third-party tile and GeoJSON requests. A
-successful build proves that the bundle compiles; it does not prove those
-external services are currently reachable.
-
-The default OpenStreetMap raster service is best-effort and has no SLA. The
-browser uses the required HTTPS tile URL, visible attribution, normal browser
-caching, and user-driven interactive viewing; it does not prefetch tiles. Review
-the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
-before adding automated map traversal, offline downloads, or material traffic.
 
 ### Legacy Tableau connector
 
 [`wdc-usga-gov.html`](./wdc-usga-gov.html) remains available for older workbook
-compatibility and now uses dependency-free Fetch with explicit Tableau error
-reporting. Tableau documents the WDC 2.x framework as deprecated and recommends
-the REST API Connector for supported current clients. Do not build new workbook
-architecture on the legacy page; migration or removal requires a separate
-owner-reviewed decision.
+compatibility and uses dependency-free Fetch with explicit Tableau error
+reporting. Tableau documents WDC 2.x as deprecated and recommends its REST API
+Connector for supported current clients. Do not build new workbook architecture
+on the legacy page; migration or removal requires a separate owner-reviewed
+decision.
 
 ## Roadmap
 
-- Add browser-level behavior tests for layer controls and partial-feed failures.
-- Document and review any future tectonic-plate snapshot refresh as a licensed
-  data update.
-- Migrate legacy Tableau consumers to the REST API Connector, then remove the
-  WDC 2.x compatibility page.
-- Add a time-series control for scrubbing through earthquake dates.
+- Add browser automation for map selection, empty filters, and fallback mode.
+- Add ShakeMap intensity products as a separately sourced observed-data layer.
+- Keep any future hypothetical earthquake and response-agent experience in a
+  separately labeled Signal Room simulation rather than mixing it with this
+  observed-data atlas.
 
 ## Contributing
 
-Open an issue before making a large behavioral change. For pull requests, keep
-changes focused and run `npm test` before requesting review.
+Open an issue before making a large behavioral change. Keep pull requests
+focused and run `npm test` before requesting review.
 
 ## License
 

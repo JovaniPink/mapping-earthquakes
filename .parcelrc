@@ -1,9 +1,11 @@
 {
   "extends": "@parcel/config-default",
   "transformers": {
-    "url:*.json": ["@parcel/transformer-raw"]
+    "url:*.json": ["@parcel/transformer-raw"],
+    "url:*.geojson": ["@parcel/transformer-raw"]
   },
   "packagers": {
-    "*.json": "@parcel/packager-raw-url"
+    "*.json": "@parcel/packager-raw-url",
+    "*.geojson": "@parcel/packager-raw-url"
   }
 }

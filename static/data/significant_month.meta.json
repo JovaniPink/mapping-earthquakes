@@ -1,0 +1,9 @@
+{
+  "source": "USGS Earthquake Hazards Program",
+  "sourceUrl": "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/significant_month.geojson",
+  "coverage": "Significant earthquakes, past 30 days",
+  "retrievedAt": "2026-08-15T07:29:58.025Z",
+  "generatedAt": "2026-08-15T07:29:45.000Z",
+  "featureCount": 13,
+  "sha256": "678b28dd22de45f6150a90170be687a2d9ab8d30441a07948a20075ee0997aa1"
+}
