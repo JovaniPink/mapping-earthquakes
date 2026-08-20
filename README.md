@@ -72,8 +72,24 @@ layer panel.
 
 ## Requirements
 
-- Node.js 24 (see [`.nvmrc`](./.nvmrc))
-- npm 11
+- Node.js 24.15.0 or newer on the Node 24 LTS line (see
+  [`.nvmrc`](./.nvmrc))
+- [Corepack](https://github.com/nodejs/corepack#readme), bundled with the
+  supported Node 24 releases
+
+The repository pins npm 12.0.2 with an integrity digest in `package.json`.
+Running npm through Corepack uses that exact package-manager release instead of
+silently accepting whichever npm happens to be installed globally. npm's
+[`devEngines`](https://docs.npmjs.com/cli/v12/configuring-npm/package-json/#devengines)
+contract rejects unsupported Node or npm versions before install, CI, and run
+commands.
+
+npm 12 also blocks dependency install scripts by default. This repository
+explicitly denies the five optional native install scripts in the current graph
+because the complete build and browser gates pass without them, and `.npmrc`
+makes any newly introduced, unreviewed install script fail the clean install.
+Review that policy deliberately when a dependency update changes the script
+inventory.
 
 No API key or secret is required.
 
@@ -81,42 +97,43 @@ No API key or secret is required.
 
 ```sh
 nvm use
-npm ci
-npm run dev
+corepack npm ci
+corepack npm run dev
 ```
 
 Parcel prints the local development URL after it starts.
 
 ## Commands
 
-| Command                | Purpose                                                        |
-| ---------------------- | -------------------------------------------------------------- |
-| `npm run dev`          | Start the Parcel development server.                           |
-| `npm run build`        | Create an optimized production bundle in `dist/`.              |
-| `npm run data:refresh` | Refresh the labeled USGS significant-month fallback + receipt. |
-| `npm run format:check` | Check source, workflow, data metadata, tests, and docs.        |
-| `npm run test:unit`    | Test data, evidence, filtering, and HTML contracts.            |
-| `npm run test:dist`    | Verify the generated data and JavaScript assets.               |
-| `npm run test:browser` | Exercise the built Atlas against offline browser fixtures.     |
-| `npm test`             | Run formatting, unit tests, build, and artifact checks.        |
+| Command                         | Purpose                                                        |
+| ------------------------------- | -------------------------------------------------------------- |
+| `corepack npm run dev`          | Start the Parcel development server.                           |
+| `corepack npm run build`        | Create an optimized production bundle in `dist/`.              |
+| `corepack npm run data:refresh` | Refresh the labeled USGS significant-month fallback + receipt. |
+| `corepack npm run format:check` | Check source, workflow, data metadata, tests, and docs.        |
+| `corepack npm run test:unit`    | Test data, evidence, filtering, and HTML contracts.            |
+| `corepack npm run test:dist`    | Verify the generated data and JavaScript assets.               |
+| `corepack npm run test:browser` | Exercise the built Atlas against offline browser fixtures.     |
+| `corepack npm test`             | Run formatting, unit tests, build, and artifact checks.        |
 
 Refreshing the snapshot is an intentional source update. Review both generated
 files and their receipt before committing them:
 
 ```sh
-npm run data:refresh
+corepack npm run data:refresh
 git diff -- static/data/significant_month.geojson static/data/significant_month.meta.json
 ```
 
-For a dependency-security check, run `npm audit --audit-level=low` after
-`npm ci`.
+For a dependency-security check, run
+`corepack npm audit --audit-level=low` after `corepack npm ci`.
+`corepack npm install-scripts ls` should report no unreviewed install scripts.
 
 Browser tests intercept the live USGS feed and external basemap with committed,
 offline fixtures. They start a local server on port 4173 by default; use one
 shared override when that port is occupied:
 
 ```sh
-ATLAS_TEST_PORT=44173 npm run test:browser
+ATLAS_TEST_PORT=44173 corepack npm run test:browser
 ```
 
 ## Project structure
@@ -137,15 +154,17 @@ ATLAS_TEST_PORT=44173 npm run test:browser
 
 ## Validation and deployment
 
-Pull requests are expected to pass `npm test` and
-`npm audit --audit-level=low` on the Node version in `.nvmrc`. The production
-bundle includes the tectonic and significant-event fallback files. A successful
-build proves that the application compiles; it does not prove that the live
-USGS feed or the external basemap is currently reachable.
+Pull requests are expected to pass `corepack npm test`,
+`corepack npm run test:browser`, and
+`corepack npm audit --audit-level=low` on the Node version in `.nvmrc`. The CI
+workflow prints the selected Node and npm versions before installing. The
+production bundle includes the tectonic and significant-event fallback files.
+A successful build proves that the application compiles; it does not prove that
+the live USGS feed or the external basemap is currently reachable.
 
 For a static host such as Netlify, use:
 
-- Build command: `npm run build`
+- Build command: `corepack npm run build`
 - Publish directory: `dist`
 
 ### Legacy Tableau connector
@@ -168,7 +187,8 @@ decision.
 ## Contributing
 
 Open an issue before making a large behavioral change. Keep pull requests
-focused and run `npm test` before requesting review.
+focused and run `corepack npm test` plus the browser gate before requesting
+review.
 
 ## License
 

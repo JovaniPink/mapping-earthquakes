@@ -18,8 +18,13 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
-      - run: npm audit --audit-level=low
+      - name: Verify the declared toolchain
+        run: |
+          node --version
+          corepack npm --version
+      - run: corepack npm ci
+      - run: corepack npm install-scripts ls
+      - run: corepack npm test
+      - run: corepack npm exec -- playwright install --with-deps chromium
+      - run: corepack npm run test:browser
+      - run: corepack npm audit --audit-level=low
