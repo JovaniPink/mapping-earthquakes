@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -14,17 +14,16 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
 
     <!-- Title -->
-    <title>WDC USGA Data</title>
+    <title>Legacy Tableau WDC — USGS Earthquakes</title>
 
     <!-- Seo -->
     <!-- Short description of the document (limit to 150 characters) -->
     <!-- This content *may* be used as a part of search engine results. -->
     <meta
       name="description"
-      content="Tableau Web Data Connector that pulls earthquake data from earthquake.usgs.gov."
+      content="Legacy Tableau Web Data Connector for the official USGS magnitude 4.5+ earthquake feed."
     />
-    <meta name="robots" content="nofollow" />
-    <meta name="googlebot" content="noindex" />
+    <meta name="robots" content="noindex, nofollow" />
     <meta
       name="keywords"
       content="data earthquakes data-analysis tableau tableau-desktop data-engineering"
@@ -34,10 +33,6 @@
     <meta name="wdc-usga-data" content="wdc-usga-data" />
     <meta name="theme-color" content="#211a23" />
 
-    <!-- Verify website ownership -->
-    <meta name="google-site-verification" content="verification_token" />
-    <!-- Google Search Console -->
-    <meta name="msvalidate.01" content="verification_token" />
     <!-- Favicon -->
     <link
       rel="apple-touch-icon"
@@ -62,18 +57,20 @@
     <link rel="manifest" href="./static/favicon/site.webmanifest" />
 
     <!-- Facebook -->
-    <meta property="fb:app_id" content="" />
     <meta
       property="og:url"
-      content="https://mapping-earthquakes.netlify.app/wdc-usga-gov"
+      content="https://mapping-earthquakes.netlify.app/wdc-usga-gov.html"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="WDC USGA Data" />
-    <meta property="og:image" content="./static/images/social.png" />
+    <meta property="og:title" content="Legacy Tableau WDC — USGS Earthquakes" />
+    <meta
+      property="og:image"
+      content="https://mapping-earthquakes.netlify.app/static/images/social.png"
+    />
     <meta property="og:image:alt" content="Picture of a Map" />
     <meta
       property="og:description"
-      content="Tableau Web Data Connector that pulls earthquake data from earthquake.usgs.gov."
+      content="Legacy Tableau Web Data Connector for the official USGS magnitude 4.5+ earthquake feed."
     />
     <meta property="og:site_name" content="WDC USGA Data" />
     <meta property="og:locale" content="en_US" />
@@ -83,18 +80,24 @@
     />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="WDC USGA Data" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@JovaniPink" />
     <meta
       name="twitter:url"
-      content="https://mapping-earthquakes.netlify.app/"
+      content="https://mapping-earthquakes.netlify.app/wdc-usga-gov.html"
     />
-    <meta name="twitter:title" content="WDC USGA Data" />
+    <meta
+      name="twitter:title"
+      content="Legacy Tableau WDC — USGS Earthquakes"
+    />
     <meta
       name="twitter:description"
-      content="Tableau Web Data Connector that pulls earthquake data from earthquake.usgs.gov."
+      content="Legacy Tableau Web Data Connector for the official USGS magnitude 4.5+ earthquake feed."
     />
-    <meta name="twitter:image" content="./static/images/social.png" />
+    <meta
+      name="twitter:image"
+      content="https://mapping-earthquakes.netlify.app/static/images/social.png"
+    />
     <meta name="twitter:image:alt" content="Picture of a Map" />
 
     <!-- CSS only
@@ -112,10 +115,15 @@
         <div class="col">
           <section>
             <div class="text-center">
-              <h1 class="h2">WDC USGA Data</h1>
+              <h1 class="h2">Legacy Tableau WDC: USGS Earthquakes</h1>
               <p class="lead">
-                Tableau Web Data Connector that pulls earthquake data from
-                earthquake.usgs.gov.
+                Compatibility connector for the official USGS magnitude 4.5+
+                weekly feed.
+              </p>
+              <p role="note">
+                Tableau has deprecated the WDC 2.x framework and recommends its
+                REST API Connector for supported current clients. Keep this page
+                only for legacy workbook compatibility.
               </p>
               <a class="btn btn-lg btn-block btn-primary" href="./index.html">
                 Return to Earthquake Mapping home page
@@ -190,37 +198,50 @@
 
         // Download the data
         myConnector.getData = function (table, doneCallback) {
-          $.getJSON(
-            'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson',
-            function (resp) {
-              var feat = resp.features,
-                tableData = [];
-
-              // Iterate over the JSON object
-              for (var i = 0, len = feat.length; i < len; i++) {
-                tableData.push({
-                  id: feat[i].id,
-                  mag: feat[i].properties.mag,
-                  title: feat[i].properties.title,
-                  location: feat[i].geometry,
-                });
+          fetch(
+            'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson'
+          )
+            .then(function (response) {
+              if (!response.ok) {
+                throw new Error(
+                  'USGS request failed with HTTP ' + response.status
+                );
               }
+              return response.json();
+            })
+            .then(function (response) {
+              if (!Array.isArray(response.features)) {
+                throw new Error('USGS response did not include a feature list');
+              }
+
+              var tableData = response.features.map(function (feature) {
+                return {
+                  id: feature.id,
+                  mag: feature.properties.mag,
+                  title: feature.properties.title,
+                  location: feature.geometry,
+                };
+              });
 
               table.appendRows(tableData);
               doneCallback();
-            }
-          );
+            })
+            .catch(function (error) {
+              tableau.abortWithError(
+                'Unable to load the USGS earthquake feed: ' + error.message
+              );
+            });
         };
 
         tableau.registerConnector(myConnector);
 
         // Create event listeners for when the user submits the form
-        $(document).ready(function () {
-          $('#submitButton').click(function () {
-            tableau.connectionName = 'USGS Earthquake Feed'; // This will be the data source name in Tableau
-            tableau.submit(); // This sends the connector object to Tableau
+        document
+          .getElementById('submitButton')
+          .addEventListener('click', function () {
+            tableau.connectionName = 'USGS Earthquake Feed';
+            tableau.submit();
           });
-        });
       })();
     </script>
   </body>

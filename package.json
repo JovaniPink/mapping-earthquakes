@@ -7,20 +7,20 @@
     "url": "git+https://github.com/JovaniPink/mapping-earthquakes"
   },
   "homepage": "https://github.com/JovaniPink/mapping-earthquakes#readme",
+  "packageManager": "npm@11.12.1",
+  "type": "module",
   "scripts": {
-    "css-compile": "node-sass --include-path node_modules --output-style compressed --source-map true --source-map-contents true --precision 6 static/scss/style.scss -o static/css/",
-    "css-prefix": "postcss --replace static/css/style.css --use autoprefixer --map",
-    "css-purge": "purgecss --css static/css/style.css --content index.html --output static/css/",
-    "css": "npm run css-compile && npm run css-prefix",
     "dev": "parcel index.html",
-    "build": "parcel build index.html --out-dir dist --public-url ./",
-    "test": "npm run css"
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && parcel build index.html --dist-dir dist --public-url ./",
+    "format:check": "prettier --check README.md THIRD_PARTY_DATA.md .github/workflows/api.yml index.html wdc-usga-gov.html static/js/app.js static/js/earthquake-data.js static/scss/app.scss tests/*.test.mjs && prettier --check .parcelrc --parser json",
+    "test:unit": "node --test tests/earthquake-data.test.mjs tests/index-contract.test.mjs",
+    "test:dist": "node --test tests/dist-contract.test.mjs",
+    "test": "npm run format:check && npm run test:unit && npm run build && npm run test:dist"
   },
   "keywords": [
     "bootstrap",
     "sass",
     "javascript",
-    "jQuery",
     "leaflet",
     "mapbox",
     "dashboard"
@@ -28,38 +28,19 @@
   "author": "Jovani Pink",
   "license": "MIT",
   "dependencies": {
-    "bootstrap": "5.0.1",
-    "bootstrap-icons": "1.5.0",
-    "jquery": "3.6.0",
-    "jquery.easing": "1.4.1",
-    "popper.js": "1.16.1-lts",
-    "leaflet": "1.7.1",
-    "leaflet-draw": "1.0.4",
-    "esri-leaflet-geocoder": "3.0.0",
-    "postcss": "8.3.0",
-    "xstate": "4.19.1",
-    "dotenv": "10.0.0"
+    "bootstrap": "5.3.8",
+    "leaflet": "1.9.4"
   },
   "devDependencies": {
-    "@babel/core": "7.14.3",
-    "@types/autoprefixer": "9.7.2",
-    "@types/babel-core": "6.25.6",
-    "@types/bootstrap": "5.0.15",
-    "@types/esri-leaflet-geocoder": "2.2.2",
-    "@types/jquery": "3.5.5",
-    "@types/leaflet": "1.7.0",
-    "@types/node": "14.17.0",
-    "@types/node-sass": "4.11.1",
-    "@types/prettier": "2.2.3",
-    "autoprefixer": "10.2.5",
-    "node-sass": "6.0.0",
-    "parcel-bundler": "1.12.5",
-    "postcss-cli": "8.3.1",
-    "prettier": "2.3.0",
-    "purgecss": "4.0.3",
-    "sass": "1.34.0"
+    "@parcel/packager-raw-url": "^2.16.4",
+    "@parcel/transformer-raw": "^2.16.4",
+    "@parcel/transformer-sass": "^2.16.4",
+    "@parcel/transformer-webmanifest": "^2.16.4",
+    "parcel": "2.16.4",
+    "prettier": "3.9.6",
+    "sass": "1.102.0"
   },
   "engines": {
-    "node": ">= 14.15.5"
+    "node": ">=22.15.0"
   }
 }

@@ -1,71 +1,159 @@
 # Mapping Earthquakes
 
-> Interactive maps using jQuery, Leaflet, GeoJSON data to map earthquakes.
+An interactive Leaflet project for exploring recent earthquakes, magnitude 4.5+
+events, and tectonic plate boundaries alongside smaller map demonstrations.
 
-![Earthquake](./resources/earth.jpg)
+![Earth viewed from space](./resources/earth.jpg)
 
-<span>Photo by <a href="https://unsplash.com/@nasa?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">NASA</a> on <a href="https://unsplash.com/s/photos/earth-quakes?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+Photo by [NASA](https://unsplash.com/@nasa) on
+[Unsplash](https://unsplash.com/s/photos/earth-quakes).
 
-## Overview of Project
+## What the site includes
 
-The purpose of this project is to visually show the differences between the magnitudes of earthquakes all over the world for the last seven days with jQuery, Leaflet, GeoJSON data.
+- A single-location Leaflet example centered on Orlando, Florida.
+- A multi-city example whose marker size represents population.
+- An earthquake map with selectable Mapbox base maps and overlay controls.
+- Magnitude-sized and color-coded markers with location details in popups.
+- Separate overlays for all earthquakes, major earthquakes, and tectonic plate
+  boundaries.
+- An embedded Tableau earthquake visualization.
+- A noindex legacy Tableau WDC 2.x compatibility page for older workbooks.
 
-## Analysis
+View the [deployed site](https://mapping-earthquakes.netlify.app/) or the
+[Tableau visualization](https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes).
 
-Use a set of URLs to map earthquake data (USGS) and retrieve geographical coordinates and the magnitudes of earthquakes for the last seven days and use different styles of maps to display the information.
+## Data sources
 
-Data:
+The browser loads GeoJSON directly from these external sources:
 
-https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson
+- [USGS all-earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson)
+- [USGS magnitude 4.5+ earthquakes, past seven days](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson)
 
-https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson
+The USGS feeds update every minute and change independently of this repository.
+Each request has a ten-second timeout, and the interface reports individual
+layer failures while leaving healthy layers interactive.
 
-https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json
+Tectonic boundaries use the repository-owned
+[`static/data/PB2002_boundaries.json`](./static/data/PB2002_boundaries.json)
+snapshot instead of a runtime request to GitHub. It is structurally equal to the
+current upstream GeoJSON and is bundled by Parcel as a versioned build asset.
+The dataset comes from Hugo Ahlenius/Nordpil's conversion of Peter Bird's plate
+model and is available under the Open Data Commons Attribution License. See
+[`THIRD_PARTY_DATA.md`](./THIRD_PARTY_DATA.md) for provenance and attribution.
 
-https://raw.githubusercontent.com/josem279/Mapping_Earthquakes/main/4.5_week.geojson
+## Requirements
 
-## Results
+- Node.js 24 (see [`.nvmrc`](./.nvmrc))
+- npm 11
+- An optional Mapbox public access token for the additional base-map styles
 
-Your approach will be to use jQuery library to retrieve the coordinates and magnitudes of the earthquakes from the GeoJSON data that is hosted on earthquake.usgs.gov. Using a Mapbox API, the Leaflet JS library through an API request and create interactivity for the earthquake data.
+OpenStreetMap is the default base layer, so the application runs without a
+Mapbox token. When supplied, the `API_KEY` value is compiled into browser
+JavaScript and is visible to visitors. Use a separate, URL-restricted public
+token with only the scopes needed to read styles and tiles. Never use a
+secret-scoped token in this project. See
+[Mapbox access-token guidance](https://docs.mapbox.com/accounts/guides/tokens/).
 
-### Maps
+## Local development
 
-https://mapping-earthquakes.netlify.app/
+```sh
+nvm use
+npm ci
+npm run dev
+```
 
-https://public.tableau.com/profile/jovanipink#!/vizhome/MappingEarthquakes_16129898573230/MappingEarthquakes
+To enable the optional Mapbox styles, copy `.env.example` to `.env` and replace
+its placeholder token, or export `API_KEY` before starting Parcel. Parcel prints
+the local development URL after it starts.
 
-### Theme Colors
+## Commands
 
-https://learnui.design/tools/data-color-picker.html#palette
+| Command                | Purpose                                            |
+| ---------------------- | -------------------------------------------------- |
+| `npm run dev`          | Start the Parcel development server.               |
+| `npm run build`        | Create an optimized production bundle in `dist/`.  |
+| `npm run format:check` | Check source, workflow, and README formatting.     |
+| `npm run test:unit`    | Test feed, styling, popup, and schema contracts.   |
+| `npm run test:dist`    | Verify the generated data and JavaScript assets.   |
+| `npm test`             | Run formatting, tests, build, and artifact checks. |
 
-- #2454a4
-- #7153ac
-- #a94da7
-- #d74896
-- #f84d7b
-- #ff635c
-- #ff8339
-- #ffa600
+For a dependency-security check, run `npm audit --audit-level=low` after
+`npm ci`.
 
-## Todo Checklist
+## Project structure
 
-A helpful checklist to gauge how your README is coming on what I would like to finish:
+```text
+.
+├── index.html                 # Page structure and metadata
+├── resources/                # Images and reference data
+├── static/data/               # Bundled tectonic-plate snapshot
+├── static/images/             # Web-sized interface and social assets
+├── static/js/app.js          # Leaflet maps and browser integration
+├── static/js/earthquake-data.js # Feed URLs and testable data contracts
+├── static/scss/app.scss      # Site styles
+├── tests/                    # Node unit tests
+├── THIRD_PARTY_DATA.md       # Dataset provenance and licensing
+├── .parcelrc                 # Raw JSON asset pipeline
+└── .github/workflows/api.yml # Install, formatting, and build checks
+```
 
-- [ ] Trying to finish a time series control where you could scrub back and forth between dates.
+Leaflet renders the maps, OpenStreetMap supplies the default tiles, and optional
+Mapbox styles are enabled when Parcel injects `API_KEY` at build time. Parcel
+emits the local tectonic dataset as a content-addressed build asset. The browser
+Fetch API loads each GeoJSON overlay independently with bounded request times.
+External feed values are escaped before they are rendered in popup HTML.
+The decorative sidebar image is a 512-pixel WebP rather than the original
+multi-megabyte source, and explicit dimensions reserve its layout space before
+the asset loads.
+
+## Validation and deployment
+
+Pull requests are expected to pass `npm test` and
+`npm audit --audit-level=low` on the Node version in `.nvmrc`. CI does not need
+a Mapbox token because OpenStreetMap is the runtime fallback. Preview and
+production hosts may provide a URL-restricted public token for the optional
+Mapbox layers.
+
+For a static host such as Netlify, use:
+
+- Build command: `npm run build`
+- Publish directory: `dist`
+- Optional environment variable: `API_KEY` set to a restricted public Mapbox
+  token
+
+The application depends on live third-party tile and GeoJSON requests. A
+successful build proves that the bundle compiles; it does not prove those
+external services are currently reachable.
+
+The default OpenStreetMap raster service is best-effort and has no SLA. The
+browser uses the required HTTPS tile URL, visible attribution, normal browser
+caching, and user-driven interactive viewing; it does not prefetch tiles. Review
+the [OpenStreetMap tile usage policy](https://operations.osmfoundation.org/policies/tiles/)
+before adding automated map traversal, offline downloads, or material traffic.
+
+### Legacy Tableau connector
+
+[`wdc-usga-gov.html`](./wdc-usga-gov.html) remains available for older workbook
+compatibility and now uses dependency-free Fetch with explicit Tableau error
+reporting. Tableau documents the WDC 2.x framework as deprecated and recommends
+the REST API Connector for supported current clients. Do not build new workbook
+architecture on the legacy page; migration or removal requires a separate
+owner-reviewed decision.
+
+## Roadmap
+
+- Add browser-level behavior tests for layer controls and partial-feed failures.
+- Document and review any future tectonic-plate snapshot refresh as a licensed
+  data update.
+- Migrate legacy Tableau consumers to the REST API Connector, then remove the
+  WDC 2.x compatibility page.
+- Add a time-series control for scrubbing through earthquake dates.
 
 ## Contributing
 
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
-
-1. Fork this repository;
-2. Create your branch: `git checkout -b my-new-feature`;
-3. Commit your changes: `git commit -m 'Add some feature'`;
-4. Push to the branch: `git push origin my-new-feature`.
-
-**After your pull request is merged**, you can safely delete your branch.
+Open an issue before making a large behavioral change. For pull requests, keep
+changes focused and run `npm test` before requesting review.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for more information.
+Licensed under the MIT License. See [LICENSE.md](./LICENSE.md).

@@ -1,17 +1,8 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, shrink-to-fit=no"
-    />
-    <!--
-        The above 2 meta tags *must* come first in the <head>
-        to consistently ensure proper document rendering.
-        Any other head element should come *after* these tags.
-      -->
-    <meta http-equiv="x-ua-compatible" content="ie=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     <!-- Title -->
     <title>Mapping Earthquakes</title>
@@ -25,11 +16,7 @@
     />
     <meta name="leaflet-basic-map" content="leaflet-basic-map" />
     <meta name="theme-color" content="#211a23" />
-
-    <!-- Verify website ownership -->
-    <meta name="google-site-verification" content="verification_token" />
-    <!-- Google Search Console -->
-    <meta name="msvalidate.01" content="verification_token" />
+    <link rel="canonical" href="https://mapping-earthquakes.netlify.app/" />
     <!-- Favicon -->
     <link
       rel="apple-touch-icon"
@@ -54,7 +41,6 @@
     <link rel="manifest" href="./static/favicon/site.webmanifest" />
 
     <!-- Facebook -->
-    <meta property="fb:app_id" content="" />
     <meta
       property="og:url"
       content="https://mapping-earthquakes.netlify.app/"
@@ -75,7 +61,7 @@
     />
 
     <!-- Twitter -->
-    <meta name="twitter:card" content="Mapping Earthquakes" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:creator" content="@JovaniPink" />
     <meta
       name="twitter:url"
@@ -104,15 +90,17 @@
         <span class="d-none d-lg-block"
           ><img
             class="img-fluid img-profile rounded-circle mx-auto mb-2"
-            src="./static/images/earthquake.png"
+            src="./static/images/earthquake.webp"
+            width="512"
+            height="512"
             alt=""
         /></span>
       </a>
       <button
         class="navbar-toggler"
         type="button"
-        data-toggle="collapse"
-        data-target="#navbarSupportedContent"
+        data-bs-toggle="collapse"
+        data-bs-target="#navbarSupportedContent"
         aria-controls="navbarSupportedContent"
         aria-expanded="false"
         aria-label="Toggle navigation"
@@ -137,13 +125,13 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="#earthquake-mapping"
+            <a class="nav-link js-scroll-trigger" href="#tableau-mapping"
               >Tableau Mapping</a
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link js-scroll-trigger" href="/wdc-usga-gov.html"
-              >Tableau WDC USGA</a
+            <a class="nav-link js-scroll-trigger" href="./wdc-usga-gov.html"
+              >Legacy Tableau WDC</a
             >
           </li>
           <hr />
@@ -152,7 +140,7 @@
               Data from USGS Earthquake Hazards Program
               <a
                 href="https://earthquake.usgs.gov/"
-                target="blank"
+                target="_blank"
                 rel="noopener noreferrer"
                 >USGS</a
               >.
@@ -160,10 +148,21 @@
           </li>
           <li class="nav-item">
             <p class="m-0">
+              Plate boundaries from
+              <a
+                href="https://github.com/fraxen/tectonicplates"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Hugo Ahlenius, Nordpil, and Peter Bird</a
+              >, licensed under ODC-By 1.0.
+            </p>
+          </li>
+          <li class="nav-item">
+            <p class="m-0">
               Contribute on Github
               <a
                 href="https://github.com/JovaniPink/mapping-earthquakes"
-                target="blank"
+                target="_blank"
                 rel="noopener noreferrer"
                 >Mapping Earthquakes</a
               >.
@@ -180,13 +179,10 @@
           <h1 class="display-1">Mapping</h1>
           <h4 class="display-3">Earthquakes</h4>
           <p class="lead">
-            Earthquake Mapping using GeoJSON data using JavaScript with D3 and
-            Leaflet libraries. Here, a map of earthquakes from the past 7days
-            around the globe is created along with a legend indicating the
-            intensity of the earthquake. Also, a layer is added that shows
-            Earth's tectonic plates so the earthquake data can be seen in
-            relation to the plates. There are 3 map tile layers that show the
-            map as a street map, a satellite map, or an outdoor map.
+            Explore earthquakes reported during the past seven days with
+            JavaScript, Leaflet, and official USGS GeoJSON feeds. Marker size
+            and color show magnitude, while optional tectonic-plate and Mapbox
+            base layers provide geographic context.
           </p>
         </div>
       </section>
@@ -216,6 +212,11 @@
         <div class="eq-section-content">
           <h2 class="display-2">Earthquake Mapping</h2>
           <div id="map-earthquakes"></div>
+          <div
+            id="earthquake-status"
+            class="alert alert-warning d-none mt-3"
+            role="alert"
+          ></div>
           <!-- The div that holds our map -->
         </div>
       </section>
@@ -278,6 +279,6 @@
     </main>
 
     <!-- App JS -->
-    <script src="./static/js/app.js"></script>
+    <script type="module" src="./static/js/app.js"></script>
   </body>
 </html>
