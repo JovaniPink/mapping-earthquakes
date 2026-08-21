@@ -60,7 +60,7 @@
     "@playwright/test": "1.62.1",
     "parcel": "2.16.4",
     "prettier": "3.9.6",
-    "sass": "1.103.0"
+    "sass": "1.103.1"
   },
   "engines": {
     "node": "^24.15.0"
