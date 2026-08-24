@@ -142,16 +142,16 @@ ATLAS_TEST_PORT=44173 corepack npm run test:browser
 
 ```text
 .
-├── docs/FULLSCREEN_ATLAS_PLAN.md     # Product, data, and validation plan
-├── index.html                        # Accessible full-screen shell
-├── scripts/refresh-usgs-snapshot.mjs # Bounded USGS refresh + SHA-256 receipt
-├── static/data/                      # Bundled fallback and tectonic snapshots
-├── static/js/app.js                  # MapLibre runtime and UI interactions
-├── static/js/earthquake-data.js      # Pure data and evidence contracts
-├── static/scss/app.scss              # Full-screen responsive presentation
-├── tests/                            # Unit, artifact, and offline browser contracts
-├── THIRD_PARTY_DATA.md               # Dataset provenance and licensing
-└── .github/workflows/api.yml         # Install, test, build, and audit checks
+|-- docs/FULLSCREEN_ATLAS_PLAN.md     # Product, data, and validation plan
+|-- index.html                        # Accessible full-screen shell
+|-- scripts/refresh-usgs-snapshot.mjs # Bounded USGS refresh + SHA-256 receipt
+|-- static/data/                      # Bundled fallback and tectonic snapshots
+|-- static/js/app.js                  # MapLibre runtime and UI interactions
+|-- static/js/earthquake-data.js      # Pure data and evidence contracts
+|-- static/scss/app.scss              # Full-screen responsive presentation
+|-- tests/                            # Unit, artifact, and offline browser contracts
+|-- THIRD_PARTY_DATA.md               # Dataset provenance and licensing
+`-- .github/workflows/api.yml         # Install, test, build, and audit checks
 ```
 
 ## Validation and deployment

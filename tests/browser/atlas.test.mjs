@@ -101,7 +101,7 @@ test('a failed live request exposes the committed fallback as fallback mode', as
   );
   await expect(page.locator('#feed-label')).toHaveText('Fallback snapshot');
   await expect(page.locator('#feed-detail')).toContainText(
-    'Significant events only · retrieved'
+    'Significant events only | retrieved'
   );
   await expect(page.locator('#panel-notice')).toHaveText(
     'The live monthly feed is unavailable. The map is showing a narrower, committed snapshot of significant events only.'

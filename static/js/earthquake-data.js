@@ -8,10 +8,10 @@ export const DAY_MS = 86_400_000;
 
 const MAGNITUDE_STOPS = Object.freeze([
   { min: 0, color: '#75c7ff', label: '< 2' },
-  { min: 2, color: '#74dbc1', label: '2–3' },
-  { min: 3, color: '#f2df74', label: '3–4' },
-  { min: 4, color: '#f3a34b', label: '4–5' },
-  { min: 5, color: '#ef6848', label: '5–6' },
+  { min: 2, color: '#74dbc1', label: '2-3' },
+  { min: 3, color: '#f2df74', label: '3-4' },
+  { min: 4, color: '#f3a34b', label: '4-5' },
+  { min: 5, color: '#ef6848', label: '5-6' },
   { min: 6, color: '#ff3e5e', label: '6+' },
 ]);
 
@@ -283,8 +283,8 @@ export function getFeedStatus({ mode, feedGeneratedAt, snapshotMetadata }) {
   return {
     label: 'Fallback snapshot',
     detail: snapshotMetadata?.retrievedAt
-      ? `Significant events only · retrieved ${snapshotMetadata.retrievedAt}`
-      : 'Significant events only · retrieval time unavailable',
+      ? `Significant events only | retrieved ${snapshotMetadata.retrievedAt}`
+      : 'Significant events only | retrieval time unavailable',
     tone: 'fallback',
   };
 }
