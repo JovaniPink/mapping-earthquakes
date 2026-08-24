@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Earthquake Atlas — Mapping Earthquakes</title>
+    <title>Earthquake Atlas - Mapping Earthquakes</title>
     <meta
       name="description"
       content="Explore the latest month of earthquakes reported by the USGS on a full-screen interactive globe."
@@ -84,7 +84,7 @@
             aria-expanded="true"
             aria-controls="atlas-panel-body"
           >
-            <span aria-hidden="true">−</span>
+            <span aria-hidden="true">-</span>
             <span class="visually-hidden">Collapse atlas panel</span>
           </button>
         </header>
@@ -99,7 +99,9 @@
             <span class="feed-state__dot" aria-hidden="true"></span>
             <div>
               <strong id="feed-label">Connecting to USGS</strong>
-              <span id="feed-detail">Requesting the latest monthly feed…</span>
+              <span id="feed-detail"
+                >Requesting the latest monthly feed...</span
+              >
             </div>
             <button class="text-button" id="refresh-data" type="button">
               Refresh
@@ -109,15 +111,15 @@
           <div class="summary-grid" aria-label="Filtered earthquake summary">
             <div>
               <span>Events</span>
-              <strong id="summary-count">—</strong>
+              <strong id="summary-count">N/A</strong>
             </div>
             <div>
               <span>Strongest</span>
-              <strong id="summary-strongest">—</strong>
+              <strong id="summary-strongest">N/A</strong>
             </div>
             <div>
               <span>Shallow</span>
-              <strong id="summary-shallow">—</strong>
+              <strong id="summary-shallow">N/A</strong>
             </div>
           </div>
 
@@ -138,7 +140,7 @@
           <details class="filter-drawer" open>
             <summary>
               <span>Observation filters</span>
-              <span id="filter-summary">M0+ · all depths · 7 days</span>
+              <span id="filter-summary">M0+ | all depths | 7 days</span>
             </summary>
             <div class="filter-grid">
               <label class="range-control" for="magnitude-filter">
@@ -159,9 +161,9 @@
                 <span>Depth</span>
                 <select id="depth-filter">
                   <option value="all">All depths</option>
-                  <option value="shallow">Shallow · under 70 km</option>
-                  <option value="intermediate">Intermediate · 70–300 km</option>
-                  <option value="deep">Deep · over 300 km</option>
+                  <option value="shallow">Shallow - under 70 km</option>
+                  <option value="intermediate">Intermediate - 70-300 km</option>
+                  <option value="deep">Deep - over 300 km</option>
                 </select>
               </label>
               <label>
@@ -182,7 +184,7 @@
               type="button"
               disabled
             >
-              Focus strongest <span aria-hidden="true">→</span>
+              Focus strongest
             </button>
             <button class="secondary-button" id="reset-filters" type="button">
               Reset
@@ -242,15 +244,15 @@
           <a href="https://openfreemap.org/" target="_blank" rel="noopener"
             >OpenFreeMap</a
           >
-          ·
+          |
           <a href="https://maplibre.org/" target="_blank" rel="noopener"
             >MapLibre</a
           >
-          ·
+          |
           <a href="https://www.openmaptiles.org/" target="_blank" rel="noopener"
             >OpenMapTiles</a
           >
-          ·
+          |
           <a
             href="https://www.openstreetmap.org/copyright"
             target="_blank"
@@ -272,41 +274,41 @@
           id="close-detail"
           type="button"
         >
-          <span aria-hidden="true">×</span>
+          <span aria-hidden="true">x</span>
           <span class="visually-hidden">Close earthquake details</span>
         </button>
         <p class="event-detail__eyebrow">USGS observed event</p>
         <div class="event-detail__headline">
-          <strong id="detail-magnitude">M—</strong>
+          <strong id="detail-magnitude">M N/A</strong>
           <div>
             <h2 id="event-detail-title">Select an earthquake</h2>
-            <p id="detail-time">—</p>
+            <p id="detail-time">Not available</p>
           </div>
         </div>
         <dl class="event-facts">
           <div>
             <dt>Depth</dt>
-            <dd id="detail-depth">—</dd>
+            <dd id="detail-depth">Not available</dd>
           </div>
           <div>
             <dt>Review</dt>
-            <dd id="detail-status">—</dd>
+            <dd id="detail-status">Not available</dd>
           </div>
           <div>
             <dt>Felt reports</dt>
-            <dd id="detail-felt">—</dd>
+            <dd id="detail-felt">Not available</dd>
           </div>
           <div>
             <dt>Significance</dt>
-            <dd id="detail-significance">—</dd>
+            <dd id="detail-significance">Not available</dd>
           </div>
           <div>
             <dt>Alert</dt>
-            <dd id="detail-alert">—</dd>
+            <dd id="detail-alert">Not available</dd>
           </div>
           <div>
             <dt>Coordinates</dt>
-            <dd id="detail-coordinates">—</dd>
+            <dd id="detail-coordinates">Not available</dd>
           </div>
         </dl>
         <a
@@ -316,7 +318,7 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          Open official USGS event <span aria-hidden="true">↗</span>
+          Open official USGS event
         </a>
       </aside>
 
@@ -330,14 +332,14 @@
           aria-label="Play the 30-day earthquake timeline"
           disabled
         >
-          <span aria-hidden="true">▶</span>
+          <span aria-hidden="true">&gt;</span>
         </button>
         <div class="timeline-copy">
           <span id="timeline-title">Observed through</span>
-          <strong id="timeline-date">—</strong>
+          <strong id="timeline-date">Not available</strong>
         </div>
         <div class="timeline-range">
-          <span id="timeline-start">—</span>
+          <span id="timeline-start">Not available</span>
           <input
             id="timeline-scrubber"
             type="range"
@@ -347,7 +349,7 @@
             aria-label="Observed-through date"
             disabled
           />
-          <span id="timeline-end">—</span>
+          <span id="timeline-end">Not available</span>
         </div>
         <div class="timeline-window" id="timeline-window">7-day window</div>
       </section>
@@ -360,9 +362,9 @@
           rel="noopener noreferrer"
           >USGS</a
         >
-        <span aria-hidden="true">·</span>
+        <span aria-hidden="true">|</span>
         <a href="./THIRD_PARTY_DATA.md">Data notes</a>
-        <span aria-hidden="true">·</span>
+        <span aria-hidden="true">|</span>
         <a href="./wdc-usga-gov.html">Legacy Tableau WDC</a>
       </div>
     </main>

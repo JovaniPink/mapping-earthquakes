@@ -211,7 +211,7 @@ test('maps magnitude and depth to stable, redundant visual buckets', () => {
   assert.equal(getDepthBucket(500), 'deep');
   assert.deepEqual(
     getLegendEntries().map(({ label }) => label),
-    ['< 2', '2–3', '3–4', '4–5', '5–6', '6+']
+    ['< 2', '2-3', '3-4', '4-5', '5-6', '6+']
   );
 });
 
@@ -278,7 +278,7 @@ test('builds honest timeline and live/fallback evidence labels', () => {
     }),
     {
       label: 'Fallback snapshot',
-      detail: 'Significant events only · retrieved 2026-08-15T00:00:00.000Z',
+      detail: 'Significant events only | retrieved 2026-08-15T00:00:00.000Z',
       tone: 'fallback',
     }
   );

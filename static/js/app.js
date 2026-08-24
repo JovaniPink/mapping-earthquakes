@@ -143,7 +143,9 @@ function formatDateTime(value) {
 }
 
 function magnitudeText(value) {
-  return Number.isFinite(Number(value)) ? `M${Number(value).toFixed(1)}` : 'M—';
+  return Number.isFinite(Number(value))
+    ? `M${Number(value).toFixed(1)}`
+    : 'M N/A';
 }
 
 function getCurrentTimeWindow() {
@@ -165,7 +167,7 @@ function setFeedState(mode, detail) {
 function setLoadingState() {
   elements['feed-state'].dataset.tone = 'loading';
   elements['feed-label'].textContent = 'Connecting to USGS';
-  elements['feed-detail'].textContent = 'Requesting the latest monthly feed…';
+  elements['feed-detail'].textContent = 'Requesting the latest monthly feed...';
   elements['refresh-data'].disabled = true;
 }
 
@@ -227,10 +229,10 @@ function renderTimeline() {
 function renderFilterSummary() {
   const minMagnitude = Number(elements['magnitude-filter'].value);
   const depthLabel =
-    elements['depth-filter'].selectedOptions[0].textContent.split(' · ')[0];
+    elements['depth-filter'].selectedOptions[0].textContent.split(' - ')[0];
   elements['magnitude-output'].textContent = `M${minMagnitude}+`;
   elements['filter-summary'].textContent =
-    `M${minMagnitude}+ · ${depthLabel.toLowerCase()} · ${state.windowDays} days`;
+    `M${minMagnitude}+ | ${depthLabel.toLowerCase()} | ${state.windowDays} days`;
 }
 
 function topEvents(features, limit = 5) {
@@ -262,7 +264,7 @@ function renderEventList() {
       feature.properties.mag >= 6 ? '#ff3e5e' : '#f3a34b'
     );
     place.textContent = feature.properties.place;
-    detail.textContent = `${formatDateTime(feature.properties.time)} · ${feature.properties.depth.toFixed(1)} km deep`;
+    detail.textContent = `${formatDateTime(feature.properties.time)} | ${feature.properties.depth.toFixed(1)} km deep`;
     copy.append(place, detail);
     button.append(magnitude, copy);
     item.append(button);
@@ -331,7 +333,7 @@ function selectEvent(feature, { moveMap = true } = {}) {
   setDetailText('detail-depth', `${properties.depth.toFixed(1)} km`);
   setDetailText(
     'detail-status',
-    `${properties.status} · ${properties.magType}`
+    `${properties.status} | ${properties.magType}`
   );
   setDetailText(
     'detail-felt',
@@ -340,7 +342,7 @@ function selectEvent(feature, { moveMap = true } = {}) {
   setDetailText('detail-significance', properties.sig.toLocaleString());
   setDetailText(
     'detail-alert',
-    `${properties.alert ? properties.alert.toUpperCase() : 'None'}${properties.tsunami ? ' · tsunami flag' : ''}`
+    `${properties.alert ? properties.alert.toUpperCase() : 'None'}${properties.tsunami ? ' | tsunami flag' : ''}`
   );
   setDetailText(
     'detail-coordinates',
@@ -350,7 +352,7 @@ function selectEvent(feature, { moveMap = true } = {}) {
   if (properties.sourceUrl) {
     elements['detail-source'].href = properties.sourceUrl;
     elements['detail-source'].removeAttribute('aria-disabled');
-    elements['detail-source'].textContent = 'Open official USGS event ↗';
+    elements['detail-source'].textContent = 'Open official USGS event';
   } else {
     elements['detail-source'].href = 'https://earthquake.usgs.gov/';
     elements['detail-source'].setAttribute('aria-disabled', 'true');
@@ -697,7 +699,7 @@ function stopPlayback() {
   if (state.playbackId) window.clearInterval(state.playbackId);
   state.playbackId = null;
   elements['timeline-play'].classList.remove('is-playing');
-  elements['timeline-play'].querySelector('span').textContent = '▶';
+  elements['timeline-play'].querySelector('span').textContent = '>';
   elements['timeline-play'].setAttribute(
     'aria-label',
     'Play the 30-day earthquake timeline'
@@ -712,7 +714,7 @@ function startPlayback() {
   }
   if (state.timelineIndex >= 29) state.timelineIndex = 0;
   elements['timeline-play'].classList.add('is-playing');
-  elements['timeline-play'].querySelector('span').textContent = 'Ⅱ';
+  elements['timeline-play'].querySelector('span').textContent = '||';
   elements['timeline-play'].setAttribute(
     'aria-label',
     'Pause the 30-day earthquake timeline'
@@ -771,7 +773,7 @@ function bindControls() {
       elements['panel-toggle'].getAttribute('aria-expanded') === 'true';
     elements['panel-toggle'].setAttribute('aria-expanded', String(!expanded));
     elements['panel-toggle'].querySelector('[aria-hidden]').textContent =
-      expanded ? '+' : '−';
+      expanded ? '+' : '-';
     elements['panel-toggle'].querySelector('.visually-hidden').textContent =
       expanded ? 'Expand atlas panel' : 'Collapse atlas panel';
     elements['atlas-panel-body'].hidden = expanded;
