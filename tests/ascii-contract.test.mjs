@@ -41,6 +41,10 @@ const textDotfiles = new Set([
   '.prettierignore',
 ]);
 
+/**
+ * @param {string} [directory]
+ * @returns {Promise<Array<{absolutePath: string, repositoryPath: string}>>}
+ */
 async function findTextFiles(directory = repositoryRoot) {
   const files = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -68,10 +72,10 @@ test('keeps repository-owned text in plain ASCII', async () => {
 
   for (const { absolutePath, repositoryPath } of await findTextFiles()) {
     const contents = await readFile(absolutePath, 'utf8');
-    const match = contents.match(/[^\x00-\x7f]/u);
-    if (match) {
+    const character = contents.match(/[^\x00-\x7f]/u)?.[0];
+    if (character) {
       violations.push(
-        `${repositoryPath}: U+${match[0].codePointAt(0).toString(16)}`
+        `${repositoryPath}: U+${character.codePointAt(0)?.toString(16)}`
       );
     }
   }

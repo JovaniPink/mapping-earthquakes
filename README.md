@@ -111,10 +111,14 @@ Parcel prints the local development URL after it starts.
 | `corepack npm run build`        | Create an optimized production bundle in `dist/`.              |
 | `corepack npm run data:refresh` | Refresh the labeled USGS significant-month fallback + receipt. |
 | `corepack npm run format:check` | Check source, workflow, data metadata, tests, and docs.        |
+| `corepack npm run typecheck`    | Type-check JavaScript, tests, and scripts without emitting.    |
 | `corepack npm run test:unit`    | Test data, evidence, filtering, and HTML contracts.            |
 | `corepack npm run test:dist`    | Verify the generated data and JavaScript assets.               |
 | `corepack npm run test:browser` | Exercise the built Atlas against offline browser fixtures.     |
-| `corepack npm test`             | Run formatting, unit tests, build, and artifact checks.        |
+| `corepack npm test`             | Run formatting, types, unit tests, build, and artifact checks. |
+
+The type gate uses strict JavaScript checking and JSDoc declarations. Parcel
+continues to build the runtime JavaScript, while TypeScript emits no files.
 
 Refreshing the snapshot is an intentional source update. Review both generated
 files and their receipt before committing them:
@@ -150,6 +154,8 @@ ATLAS_TEST_PORT=44173 corepack npm run test:browser
 |-- static/js/earthquake-data.js      # Pure data and evidence contracts
 |-- static/scss/app.scss              # Full-screen responsive presentation
 |-- tests/                            # Unit, artifact, and offline browser contracts
+|-- types/                            # Parcel asset-module declarations
+|-- jsconfig.json                     # Strict JavaScript type-checking contract
 |-- THIRD_PARTY_DATA.md               # Dataset provenance and licensing
 `-- .github/workflows/api.yml         # Install, test, build, and audit checks
 ```

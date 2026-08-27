@@ -3,6 +3,8 @@ import { readFile } from 'node:fs/promises';
 
 import { atlasTestOrigin } from './test-server.mjs';
 
+/** @import {Page} from '@playwright/test' */
+
 const liveFeedUrl =
   'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson';
 const basemapStyleUrl = 'https://tiles.openfreemap.org/styles/fiord';
@@ -10,10 +12,28 @@ const liveFixture = await readFile(
   new URL('../fixtures/usgs-month.geojson', import.meta.url),
   'utf8'
 );
+/**
+ * @type {{
+ *   metadata: {generated: number},
+ *   features: Array<{
+ *     id: string,
+ *     properties: {
+ *       felt: number,
+ *       mag: number,
+ *       place: string,
+ *       title: string,
+ *       updated: number,
+ *     },
+ *   }>,
+ * }}
+ */
 const revisedFixturePayload = JSON.parse(liveFixture);
 const revisedEvent = revisedFixturePayload.features.find(
   ({ id }) => id === 'test-fixture-ridge'
 );
+if (!revisedEvent) {
+  throw new Error('Revised browser fixture event is missing');
+}
 revisedFixturePayload.metadata.generated += 60_000;
 revisedEvent.properties.mag = 6.7;
 revisedEvent.properties.place = 'Revised Browser Fixture Ridge';
@@ -28,8 +48,14 @@ const emptyBasemapStyle = JSON.stringify({
   layers: [],
 });
 
+/**
+ * @param {Page} page
+ * @param {{liveFeed?: 'fixture' | 'revised-on-refresh' | 'unavailable'}} [options]
+ */
 export async function openAtlas(page, { liveFeed = 'fixture' } = {}) {
+  /** @type {string[]} */
   const pageErrors = [];
+  /** @type {string[]} */
   const externalRequests = [];
   let liveRequestCount = 0;
   page.on('pageerror', (error) => pageErrors.push(error.message));
