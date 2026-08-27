@@ -9,11 +9,29 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const snapshotPath = resolve(root, 'static/data/significant_month.geojson');
 const metadataPath = resolve(root, 'static/data/significant_month.meta.json');
 
+/**
+ * @param {unknown} payload
+ * @returns {asserts payload is {
+ *   type: 'FeatureCollection',
+ *   features: unknown[],
+ *   metadata: {generated: unknown},
+ * }}
+ */
 function assertFeatureCollection(payload) {
+  const candidate =
+    typeof payload === 'object' && payload !== null
+      ? /** @type {Record<string, unknown>} */ (payload)
+      : {};
   if (
-    payload?.type !== 'FeatureCollection' ||
-    !Array.isArray(payload.features) ||
-    !Number.isFinite(Number(payload?.metadata?.generated))
+    candidate.type !== 'FeatureCollection' ||
+    !Array.isArray(candidate.features) ||
+    typeof candidate.metadata !== 'object' ||
+    candidate.metadata === null ||
+    !Number.isFinite(
+      Number(
+        /** @type {Record<string, unknown>} */ (candidate.metadata).generated
+      )
+    )
   ) {
     throw new Error(
       'USGS response is not a generated GeoJSON FeatureCollection'

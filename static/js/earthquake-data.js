@@ -1,3 +1,17 @@
+/**
+ * @import {
+ *   AlertLevel,
+ *   DepthBucket,
+ *   EarthquakeFeature,
+ *   EarthquakeFeatureCollection,
+ *   FallbackReceipt,
+ *   FeatureFilters,
+ *   FeedMode,
+ *   JsonRequest,
+ *   RawFeatureCollection,
+ * } from '../../types/earthquake.d.ts'
+ */
+
 export const LIVE_DATA_SOURCE =
   'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson';
 export const FALLBACK_DATA_SOURCE =
@@ -15,6 +29,21 @@ const MAGNITUDE_STOPS = Object.freeze([
   { min: 6, color: '#ff3e5e', label: '6+' },
 ]);
 
+const ALERT_LEVELS = new Set(['green', 'yellow', 'orange', 'red']);
+
+/**
+ * @param {unknown} value
+ * @returns {value is Record<string, unknown>}
+ */
+function isRecord(value) {
+  return typeof value === 'object' && value !== null;
+}
+
+/**
+ * @param {unknown} tectonicPlatesUrl
+ * @param {unknown} fallbackSnapshotUrl
+ * @param {unknown} fallbackMetadataUrl
+ */
 export function createDataSources(
   tectonicPlatesUrl,
   fallbackSnapshotUrl,
@@ -33,12 +62,22 @@ export function createDataSources(
   return Object.freeze({ liveEarthquakes: LIVE_DATA_SOURCE, ...values });
 }
 
+/**
+ * @param {unknown} payload
+ * @returns {payload is RawFeatureCollection}
+ */
 export function isFeatureCollection(payload) {
   return (
-    payload?.type === 'FeatureCollection' && Array.isArray(payload.features)
+    isRecord(payload) &&
+    payload.type === 'FeatureCollection' &&
+    Array.isArray(payload.features)
   );
 }
 
+/**
+ * @param {unknown} value
+ * @returns {number | null}
+ */
 export function toFiniteNumber(value) {
   if (
     value == null ||
@@ -51,6 +90,7 @@ export function toFiniteNumber(value) {
   return Number.isFinite(number) ? number : null;
 }
 
+/** @param {unknown} value */
 export function isOfficialUsgsEventUrl(value) {
   try {
     const url = new URL(String(value ?? ''));
@@ -63,37 +103,56 @@ export function isOfficialUsgsEventUrl(value) {
   }
 }
 
+/**
+ * @param {unknown} feature
+ * @returns {EarthquakeFeature | null}
+ */
 export function normalizeFeature(feature) {
-  const coordinates = feature?.geometry?.coordinates;
+  const candidate = isRecord(feature) ? feature : {};
+  const geometry = isRecord(candidate.geometry) ? candidate.geometry : {};
+  const properties = isRecord(candidate.properties) ? candidate.properties : {};
+  const coordinates = Array.isArray(geometry.coordinates)
+    ? geometry.coordinates
+    : [];
   const longitude = toFiniteNumber(coordinates?.[0]);
   const latitude = toFiniteNumber(coordinates?.[1]);
   const depth = toFiniteNumber(coordinates?.[2]);
-  const magnitude = toFiniteNumber(feature?.properties?.mag);
-  const time = toFiniteNumber(feature?.properties?.time);
+  const magnitude = toFiniteNumber(properties.mag);
+  const time = toFiniteNumber(properties.time);
 
   if (
-    feature?.geometry?.type !== 'Point' ||
-    !Number.isFinite(longitude) ||
-    !Number.isFinite(latitude) ||
+    geometry.type !== 'Point' ||
+    longitude == null ||
+    latitude == null ||
     longitude < -180 ||
     longitude > 180 ||
     latitude < -90 ||
     latitude > 90 ||
-    !Number.isFinite(depth) ||
-    !Number.isFinite(magnitude) ||
-    !Number.isFinite(time)
+    depth == null ||
+    magnitude == null ||
+    time == null
   ) {
     return null;
   }
 
-  const properties = feature.properties ?? {};
   const sourceUrl = isOfficialUsgsEventUrl(properties.url)
-    ? properties.url
+    ? String(properties.url)
     : null;
+  const alert =
+    typeof properties.alert === 'string' && ALERT_LEVELS.has(properties.alert)
+      ? /** @type {AlertLevel} */ (properties.alert)
+      : null;
   return {
     type: 'Feature',
-    id: String(feature.id ?? `${longitude}:${latitude}:${time}`),
-    geometry: { type: 'Point', coordinates: [longitude, latitude, depth] },
+    id: String(candidate.id ?? `${longitude}:${latitude}:${time}`),
+    geometry: {
+      type: 'Point',
+      coordinates: /** @type {[number, number, number]} */ ([
+        longitude,
+        latitude,
+        depth,
+      ]),
+    },
     properties: {
       mag: magnitude,
       place: String(properties.place || 'Unknown location'),
@@ -102,9 +161,7 @@ export function normalizeFeature(feature) {
       depth,
       felt: toFiniteNumber(properties.felt),
       sig: toFiniteNumber(properties.sig) ?? 0,
-      alert: ['green', 'yellow', 'orange', 'red'].includes(properties.alert)
-        ? properties.alert
-        : null,
+      alert,
       tsunami: Number(properties.tsunami) === 1,
       status: String(properties.status || 'unknown'),
       magType: String(properties.magType || 'unknown'),
@@ -114,17 +171,24 @@ export function normalizeFeature(feature) {
   };
 }
 
+/**
+ * @param {unknown} payload
+ * @returns {EarthquakeFeatureCollection}
+ */
 export function normalizeFeatureCollection(payload) {
   if (!isFeatureCollection(payload)) {
     throw new Error('Response is not a GeoJSON FeatureCollection');
   }
 
-  const generated = Number(payload?.metadata?.generated);
+  const metadata = isRecord(payload.metadata) ? payload.metadata : {};
+  const generated = Number(metadata.generated);
   if (!Number.isFinite(generated) || generated <= 0) {
     throw new Error('FeatureCollection is missing a valid generation time');
   }
 
-  const features = payload.features.map(normalizeFeature).filter(Boolean);
+  const features = payload.features
+    .map(normalizeFeature)
+    .filter((feature) => feature !== null);
   if (payload.features.length > 0 && features.length === 0) {
     throw new Error('FeatureCollection contains no valid earthquake features');
   }
@@ -133,7 +197,7 @@ export function normalizeFeatureCollection(payload) {
     type: 'FeatureCollection',
     metadata: {
       generated,
-      title: String(payload?.metadata?.title || 'USGS earthquake feed'),
+      title: String(metadata.title || 'USGS earthquake feed'),
       sourceCount: payload.features.length,
       acceptedCount: features.length,
       rejectedCount: payload.features.length - features.length,
@@ -142,25 +206,43 @@ export function normalizeFeatureCollection(payload) {
   };
 }
 
+/**
+ * @param {unknown} currentIndex
+ * @param {{silent?: boolean}} [options]
+ */
 export function getRefreshTimelineIndex(currentIndex, { silent = false } = {}) {
   const index = toFiniteNumber(currentIndex);
-  return silent && Number.isInteger(index) && index >= 0 && index <= 29
+  return silent &&
+    index != null &&
+    Number.isInteger(index) &&
+    index >= 0 &&
+    index <= 29
     ? index
     : 29;
 }
 
+/**
+ * @param {EarthquakeFeature[]} features
+ * @param {unknown} selectedId
+ */
 export function findFeatureById(features, selectedId) {
   if (selectedId == null || !Array.isArray(features)) return null;
   return features.find(({ id }) => id === selectedId) ?? null;
 }
 
+/**
+ * @param {EarthquakeFeatureCollection} collection
+ * @param {unknown} receipt
+ * @returns {Readonly<FallbackReceipt>}
+ */
 export function validateFallbackReceipt(collection, receipt) {
-  const generatedAt = Date.parse(String(receipt?.generatedAt ?? ''));
-  const retrievedAt = Date.parse(String(receipt?.retrievedAt ?? ''));
-  const featureCount = Number(receipt?.featureCount);
-  const sha256 = String(receipt?.sha256 ?? '');
+  const candidate = isRecord(receipt) ? receipt : {};
+  const generatedAt = Date.parse(String(candidate.generatedAt ?? ''));
+  const retrievedAt = Date.parse(String(candidate.retrievedAt ?? ''));
+  const featureCount = Number(candidate.featureCount);
+  const sha256 = String(candidate.sha256 ?? '');
 
-  if (receipt?.sourceUrl !== FALLBACK_DATA_SOURCE) {
+  if (candidate.sourceUrl !== FALLBACK_DATA_SOURCE) {
     throw new Error('Fallback receipt has an unexpected source URL');
   }
   if (
@@ -173,7 +255,7 @@ export function validateFallbackReceipt(collection, receipt) {
     throw new Error('Fallback receipt retrieval time is invalid');
   }
   if (
-    typeof receipt?.featureCount !== 'number' ||
+    typeof candidate.featureCount !== 'number' ||
     !Number.isSafeInteger(featureCount) ||
     featureCount < 0 ||
     featureCount !== collection?.metadata?.sourceCount
@@ -185,7 +267,11 @@ export function validateFallbackReceipt(collection, receipt) {
   }
 
   return Object.freeze({
-    ...receipt,
+    ...candidate,
+    source: typeof candidate.source === 'string' ? candidate.source : undefined,
+    coverage:
+      typeof candidate.coverage === 'string' ? candidate.coverage : undefined,
+    sourceUrl: FALLBACK_DATA_SOURCE,
     featureCount,
     generatedAt: new Date(generatedAt).toISOString(),
     retrievedAt: new Date(retrievedAt).toISOString(),
@@ -193,18 +279,23 @@ export function validateFallbackReceipt(collection, receipt) {
   });
 }
 
+/** @param {unknown} magnitude */
 export function getMagnitudeColor(magnitude) {
   const value = Number(magnitude);
   const selected = [...MAGNITUDE_STOPS]
     .reverse()
     .find(({ min }) => Number.isFinite(value) && value >= min);
-  return selected?.color ?? MAGNITUDE_STOPS[0].color;
+  return selected?.color ?? MAGNITUDE_STOPS.at(0)?.color ?? '#75c7ff';
 }
 
 export function getLegendEntries() {
   return MAGNITUDE_STOPS.map(({ color, label }) => ({ color, label }));
 }
 
+/**
+ * @param {unknown} depth
+ * @returns {Exclude<DepthBucket, 'all'>}
+ */
 export function getDepthBucket(depth) {
   const value = Number(depth);
   if (!Number.isFinite(value)) return 'unknown';
@@ -213,6 +304,10 @@ export function getDepthBucket(depth) {
   return 'deep';
 }
 
+/**
+ * @param {unknown} generatedAt
+ * @param {number} [days]
+ */
 export function getTimelineBounds(generatedAt, days = 30) {
   const end = Number(generatedAt);
   if (!Number.isFinite(end))
@@ -220,6 +315,10 @@ export function getTimelineBounds(generatedAt, days = 30) {
   return { start: end - Math.max(1, Number(days)) * DAY_MS, end };
 }
 
+/**
+ * @param {EarthquakeFeature[]} features
+ * @param {FeatureFilters} filters
+ */
 export function filterFeatures(
   features,
   {
@@ -244,6 +343,7 @@ export function filterFeatures(
   });
 }
 
+/** @param {EarthquakeFeature[]} features */
 export function selectStrongest(features) {
   return (
     [...features].sort(
@@ -256,6 +356,7 @@ export function selectStrongest(features) {
   );
 }
 
+/** @param {EarthquakeFeature[]} features */
 export function summarizeFeatures(features) {
   const strongest = selectStrongest(features);
   return {
@@ -269,6 +370,13 @@ export function summarizeFeatures(features) {
   };
 }
 
+/**
+ * @param {{
+ *   mode: FeedMode,
+ *   feedGeneratedAt?: number | null,
+ *   snapshotMetadata?: Pick<FallbackReceipt, 'retrievedAt'> | null,
+ * }} options
+ */
 export function getFeedStatus({ mode, feedGeneratedAt, snapshotMetadata }) {
   if (mode === 'live') {
     return {
@@ -289,6 +397,12 @@ export function getFeedStatus({ mode, feedGeneratedAt, snapshotMetadata }) {
   };
 }
 
+/**
+ * @param {string | URL} url
+ * @param {JsonRequest} [request]
+ * @param {number} [timeoutMs]
+ * @returns {Promise<unknown>}
+ */
 export async function fetchJson(
   url,
   request = fetch,
@@ -314,6 +428,12 @@ export async function fetchJson(
   }
 }
 
+/**
+ * @param {string | URL} url
+ * @param {JsonRequest} [request]
+ * @param {number} [timeoutMs]
+ * @returns {Promise<EarthquakeFeatureCollection>}
+ */
 export async function fetchFeatureCollection(
   url,
   request = fetch,

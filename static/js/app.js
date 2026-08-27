@@ -5,6 +5,15 @@ import fallbackSnapshotUrl from 'url:../data/significant_month.geojson';
 import tectonicPlatesUrl from 'url:../data/PB2002_boundaries.json';
 
 import '../scss/app.scss';
+/**
+ * @import {
+ *   DepthBucket,
+ *   EarthquakeFeature,
+ *   EarthquakeFeatureCollection,
+ *   FallbackReceipt,
+ *   FeedMode,
+ * } from '../../types/earthquake.d.ts'
+ */
 import {
   DAY_MS,
   createDataSources,
@@ -21,6 +30,7 @@ import {
 } from './earthquake-data.js';
 
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/fiord';
+/** @type {import('geojson').FeatureCollection} */
 const EMPTY_COLLECTION = Object.freeze({
   type: 'FeatureCollection',
   features: [],
@@ -32,61 +42,109 @@ const dataSources = createDataSources(
 );
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-const elements = Object.fromEntries(
-  [
-    'feed-state',
-    'feed-label',
-    'feed-detail',
-    'refresh-data',
-    'summary-count',
-    'summary-strongest',
-    'summary-shallow',
-    'place-search',
-    'magnitude-filter',
-    'magnitude-output',
-    'depth-filter',
-    'window-filter',
-    'filter-summary',
-    'focus-strongest',
-    'reset-filters',
-    'event-list',
-    'result-count',
-    'panel-notice',
-    'panel-toggle',
-    'atlas-panel-body',
-    'projection-toggle',
-    'toggle-events',
-    'toggle-heat',
-    'toggle-plates',
-    'magnitude-legend',
-    'event-detail',
-    'close-detail',
-    'event-detail-title',
-    'detail-magnitude',
-    'detail-time',
-    'detail-depth',
-    'detail-status',
-    'detail-felt',
-    'detail-significance',
-    'detail-alert',
-    'detail-coordinates',
-    'detail-source',
-    'map-message',
-    'timeline-play',
-    'timeline-date',
-    'timeline-start',
-    'timeline-end',
-    'timeline-scrubber',
-    'timeline-window',
-    'earthquake-map',
-  ].map((id) => [id, document.getElementById(id)])
-);
+/**
+ * @template {HTMLElement} ElementType
+ * @param {string} id
+ * @param {new () => ElementType} ElementConstructor
+ * @returns {ElementType}
+ */
+function requiredElement(id, ElementConstructor) {
+  const element = document.getElementById(id);
+  if (!(element instanceof ElementConstructor)) {
+    throw new Error(`Required element #${id} has the wrong type or is missing`);
+  }
+  return element;
+}
 
+/**
+ * @param {ParentNode} parent
+ * @param {string} selector
+ */
+function requiredSelector(parent, selector) {
+  const element = parent.querySelector(selector);
+  if (!(element instanceof HTMLElement)) {
+    throw new Error(`Required element ${selector} is missing`);
+  }
+  return element;
+}
+
+const elements = {
+  'feed-state': requiredElement('feed-state', HTMLElement),
+  'feed-label': requiredElement('feed-label', HTMLElement),
+  'feed-detail': requiredElement('feed-detail', HTMLElement),
+  'refresh-data': requiredElement('refresh-data', HTMLButtonElement),
+  'summary-count': requiredElement('summary-count', HTMLElement),
+  'summary-strongest': requiredElement('summary-strongest', HTMLElement),
+  'summary-shallow': requiredElement('summary-shallow', HTMLElement),
+  'place-search': requiredElement('place-search', HTMLInputElement),
+  'magnitude-filter': requiredElement('magnitude-filter', HTMLInputElement),
+  'magnitude-output': requiredElement('magnitude-output', HTMLOutputElement),
+  'depth-filter': requiredElement('depth-filter', HTMLSelectElement),
+  'window-filter': requiredElement('window-filter', HTMLSelectElement),
+  'filter-summary': requiredElement('filter-summary', HTMLElement),
+  'focus-strongest': requiredElement('focus-strongest', HTMLButtonElement),
+  'reset-filters': requiredElement('reset-filters', HTMLButtonElement),
+  'event-list': requiredElement('event-list', HTMLOListElement),
+  'result-count': requiredElement('result-count', HTMLElement),
+  'panel-notice': requiredElement('panel-notice', HTMLParagraphElement),
+  'panel-toggle': requiredElement('panel-toggle', HTMLButtonElement),
+  'atlas-panel-body': requiredElement('atlas-panel-body', HTMLDivElement),
+  'projection-toggle': requiredElement('projection-toggle', HTMLButtonElement),
+  'toggle-events': requiredElement('toggle-events', HTMLInputElement),
+  'toggle-heat': requiredElement('toggle-heat', HTMLInputElement),
+  'toggle-plates': requiredElement('toggle-plates', HTMLInputElement),
+  'magnitude-legend': requiredElement('magnitude-legend', HTMLDivElement),
+  'event-detail': requiredElement('event-detail', HTMLElement),
+  'close-detail': requiredElement('close-detail', HTMLButtonElement),
+  'event-detail-title': requiredElement('event-detail-title', HTMLElement),
+  'detail-magnitude': requiredElement('detail-magnitude', HTMLElement),
+  'detail-time': requiredElement('detail-time', HTMLParagraphElement),
+  'detail-depth': requiredElement('detail-depth', HTMLElement),
+  'detail-status': requiredElement('detail-status', HTMLElement),
+  'detail-felt': requiredElement('detail-felt', HTMLElement),
+  'detail-significance': requiredElement('detail-significance', HTMLElement),
+  'detail-alert': requiredElement('detail-alert', HTMLElement),
+  'detail-coordinates': requiredElement('detail-coordinates', HTMLElement),
+  'detail-source': requiredElement('detail-source', HTMLAnchorElement),
+  'map-message': requiredElement('map-message', HTMLDivElement),
+  'timeline-play': requiredElement('timeline-play', HTMLButtonElement),
+  'timeline-date': requiredElement('timeline-date', HTMLElement),
+  'timeline-start': requiredElement('timeline-start', HTMLElement),
+  'timeline-end': requiredElement('timeline-end', HTMLElement),
+  'timeline-scrubber': requiredElement('timeline-scrubber', HTMLInputElement),
+  'timeline-window': requiredElement('timeline-window', HTMLDivElement),
+  'earthquake-map': requiredElement('earthquake-map', HTMLDivElement),
+};
+
+const atlasPanel = requiredSelector(document, '.atlas-panel');
+const panelToggleIcon = requiredSelector(
+  elements['panel-toggle'],
+  '[aria-hidden]'
+);
+const panelToggleLabel = requiredSelector(
+  elements['panel-toggle'],
+  '.visually-hidden'
+);
+const timelinePlayIcon = requiredSelector(elements['timeline-play'], 'span');
+
+/**
+ * @type {{
+ *   allFeatures: EarthquakeFeature[],
+ *   filteredFeatures: EarthquakeFeature[],
+ *   feedGeneratedAt: number | null,
+ *   snapshotMetadata: Readonly<FallbackReceipt> | null,
+ *   selectedId: string | null,
+ *   timelineIndex: number,
+ *   windowDays: number,
+ *   isGlobe: boolean,
+ *   mapReady: boolean,
+ *   playbackId: number | null,
+ * }}
+ */
 const state = {
   allFeatures: [],
   filteredFeatures: [],
   feedGeneratedAt: null,
-  mode: 'loading',
   snapshotMetadata: null,
   selectedId: null,
   timelineIndex: 29,
@@ -115,10 +173,32 @@ map.addControl(
 );
 map.addControl(new maplibregl.FullscreenControl(), 'top-right');
 
+/**
+ * @param {string} id
+ * @returns {maplibregl.GeoJSONSource | null}
+ */
+function getGeoJsonSource(id) {
+  const source = map.getSource(id);
+  return source && 'setData' in source
+    ? /** @type {maplibregl.GeoJSONSource} */ (source)
+    : null;
+}
+
+/**
+ * @param {EarthquakeFeature[]} features
+ * @returns {import('geojson').FeatureCollection<
+ *   import('geojson').Point,
+ *   import('../../types/earthquake.d.ts').EarthquakeProperties
+ * >}
+ */
 function eventCollection(features) {
   return { type: 'FeatureCollection', features };
 }
 
+/**
+ * @param {string | number | Date} value
+ * @param {Intl.DateTimeFormatOptions} [options]
+ */
 function formatDate(value, options = {}) {
   return new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC',
@@ -129,6 +209,7 @@ function formatDate(value, options = {}) {
   }).format(new Date(value));
 }
 
+/** @param {string | number | Date} value */
 function formatDateTime(value) {
   return new Intl.DateTimeFormat('en-US', {
     timeZone: 'UTC',
@@ -142,6 +223,7 @@ function formatDateTime(value) {
   }).format(new Date(value));
 }
 
+/** @param {unknown} value */
 function magnitudeText(value) {
   return Number.isFinite(Number(value))
     ? `M${Number(value).toFixed(1)}`
@@ -149,11 +231,18 @@ function magnitudeText(value) {
 }
 
 function getCurrentTimeWindow() {
+  if (state.feedGeneratedAt == null) {
+    throw new Error('Feed generation time is unavailable');
+  }
   const end = state.feedGeneratedAt - (29 - state.timelineIndex) * DAY_MS;
   return { start: end - state.windowDays * DAY_MS, end };
 }
 
-function setFeedState(mode, detail) {
+/**
+ * @param {Exclude<FeedMode, 'loading'>} mode
+ * @param {string} [detail]
+ */
+function setFeedState(mode, detail = '') {
   const status = getFeedStatus({
     mode,
     feedGeneratedAt: state.feedGeneratedAt,
@@ -171,6 +260,10 @@ function setLoadingState() {
   elements['refresh-data'].disabled = true;
 }
 
+/**
+ * @param {EarthquakeFeatureCollection} collection
+ * @param {string} label
+ */
 function reportRejectedFeatures(collection, label) {
   if (!collection.metadata.rejectedCount) return;
   console.warn(
@@ -178,6 +271,7 @@ function reportRejectedFeatures(collection, label) {
   );
 }
 
+/** @param {string} message */
 function setMapMessage(message) {
   elements['map-message'].textContent = message;
   elements['map-message'].hidden = !message;
@@ -211,14 +305,16 @@ function renderSummary() {
 }
 
 function renderTimeline() {
-  const fullStart = state.feedGeneratedAt - 29 * DAY_MS;
+  const generatedAt = state.feedGeneratedAt;
+  if (generatedAt == null) return;
+  const fullStart = generatedAt - 29 * DAY_MS;
   const { end } = getCurrentTimeWindow();
   elements['timeline-date'].textContent = formatDate(end, { weekday: 'short' });
   elements['timeline-start'].textContent = formatDate(fullStart, {
     month: 'short',
     day: 'numeric',
   });
-  elements['timeline-end'].textContent = formatDate(state.feedGeneratedAt, {
+  elements['timeline-end'].textContent = formatDate(generatedAt, {
     month: 'short',
     day: 'numeric',
   });
@@ -229,12 +325,28 @@ function renderTimeline() {
 function renderFilterSummary() {
   const minMagnitude = Number(elements['magnitude-filter'].value);
   const depthLabel =
-    elements['depth-filter'].selectedOptions[0].textContent.split(' - ')[0];
+    elements['depth-filter'].selectedOptions
+      .item(0)
+      ?.textContent?.split(' - ')
+      .at(0) ?? 'All depths';
   elements['magnitude-output'].textContent = `M${minMagnitude}+`;
   elements['filter-summary'].textContent =
     `M${minMagnitude}+ | ${depthLabel.toLowerCase()} | ${state.windowDays} days`;
 }
 
+/** @returns {Exclude<DepthBucket, 'unknown'>} */
+function getSelectedDepth() {
+  const value = elements['depth-filter'].value;
+  if (value === 'shallow' || value === 'intermediate' || value === 'deep') {
+    return value;
+  }
+  return 'all';
+}
+
+/**
+ * @param {EarthquakeFeature[]} features
+ * @param {number} [limit]
+ */
 function topEvents(features, limit = 5) {
   return [...features]
     .sort(
@@ -283,8 +395,8 @@ function renderEventList() {
 
 function updateMapSources() {
   const collection = eventCollection(state.filteredFeatures);
-  map.getSource('earthquake-heat')?.setData(collection);
-  map.getSource('earthquake-events')?.setData(collection);
+  getGeoJsonSource('earthquake-heat')?.setData(collection);
+  getGeoJsonSource('earthquake-events')?.setData(collection);
 }
 
 function applyFilters() {
@@ -292,7 +404,7 @@ function applyFilters() {
   const { start, end } = getCurrentTimeWindow();
   state.filteredFeatures = filterFeatures(state.allFeatures, {
     minMagnitude: Number(elements['magnitude-filter'].value),
-    depth: elements['depth-filter'].value,
+    depth: getSelectedDepth(),
     startTime: start,
     endTime: end,
     query: elements['place-search'].value,
@@ -317,10 +429,18 @@ function applyFilters() {
   renderEventList();
 }
 
+/**
+ * @param {keyof typeof elements} id
+ * @param {string} value
+ */
 function setDetailText(id, value) {
   elements[id].textContent = value;
 }
 
+/**
+ * @param {EarthquakeFeature | null | undefined} feature
+ * @param {{moveMap?: boolean}} [options]
+ */
 function selectEvent(feature, { moveMap = true } = {}) {
   if (!feature) return;
   state.selectedId = feature.id;
@@ -360,7 +480,7 @@ function selectEvent(feature, { moveMap = true } = {}) {
   }
 
   elements['event-detail'].hidden = false;
-  map.getSource('selected-event')?.setData(eventCollection([feature]));
+  getGeoJsonSource('selected-event')?.setData(eventCollection([feature]));
   if (moveMap) {
     map.flyTo({
       center: [longitude, latitude],
@@ -374,9 +494,10 @@ function selectEvent(feature, { moveMap = true } = {}) {
 function closeDetail() {
   state.selectedId = null;
   elements['event-detail'].hidden = true;
-  map.getSource('selected-event')?.setData(EMPTY_COLLECTION);
+  getGeoJsonSource('selected-event')?.setData(EMPTY_COLLECTION);
 }
 
+/** @param {{silent?: boolean}} [options] */
 async function loadData({ silent = false } = {}) {
   if (!silent) setLoadingState();
   try {
@@ -386,7 +507,6 @@ async function loadData({ silent = false } = {}) {
     reportRejectedFeatures(collection, 'Live USGS feed');
     state.allFeatures = collection.features;
     state.feedGeneratedAt = collection.metadata.generated;
-    state.mode = 'live';
     state.snapshotMetadata = null;
     state.timelineIndex = getRefreshTimelineIndex(state.timelineIndex, {
       silent,
@@ -408,7 +528,6 @@ async function loadData({ silent = false } = {}) {
       state.allFeatures = collection.features;
       state.snapshotMetadata = receipt;
       state.feedGeneratedAt = collection.metadata.generated;
-      state.mode = 'fallback';
       state.timelineIndex = getRefreshTimelineIndex(state.timelineIndex, {
         silent,
       });
@@ -619,7 +738,12 @@ function addEarthquakeLayers() {
   });
 }
 
+/**
+ * @param {maplibregl.MapGeoJSONFeature | undefined} renderedFeature
+ * @returns {EarthquakeFeature | null}
+ */
 function eventFromMapFeature(renderedFeature) {
+  if (renderedFeature?.id == null) return null;
   return (
     state.filteredFeatures.find(
       ({ id }) => id === String(renderedFeature.id)
@@ -631,12 +755,20 @@ function bindMapInteractions() {
   map.on('click', 'event-clusters', async (event) => {
     const cluster = event.features?.[0];
     if (!cluster) return;
-    const source = map.getSource('earthquake-events');
-    const zoom = await source.getClusterExpansionZoom(
-      cluster.properties.cluster_id
-    );
+    const source = getGeoJsonSource('earthquake-events');
+    const clusterId = Number(cluster.properties?.cluster_id);
+    if (
+      !source ||
+      !Number.isSafeInteger(clusterId) ||
+      cluster.geometry.type !== 'Point'
+    ) {
+      return;
+    }
+    const zoom = await source.getClusterExpansionZoom(clusterId);
     map.easeTo({
-      center: cluster.geometry.coordinates,
+      center: /** @type {[number, number]} */ (
+        cluster.geometry.coordinates.slice(0, 2)
+      ),
       zoom,
       duration: reducedMotion.matches ? 0 : 650,
     });
@@ -664,7 +796,11 @@ function bindMapInteractions() {
     place.textContent = feature.properties.place;
     content.append(strong, place);
     hoverPopup
-      .setLngLat(feature.geometry.coordinates.slice(0, 2))
+      .setLngLat(
+        /** @type {[number, number]} */ (
+          feature.geometry.coordinates.slice(0, 2)
+        )
+      )
       .setDOMContent(content)
       .addTo(map);
   });
@@ -674,6 +810,10 @@ function bindMapInteractions() {
   });
 }
 
+/**
+ * @param {string[]} layerIds
+ * @param {boolean} visible
+ */
 function setLayerVisibility(layerIds, visible) {
   layerIds.forEach((id) => {
     if (map.getLayer(id))
@@ -699,7 +839,7 @@ function stopPlayback() {
   if (state.playbackId) window.clearInterval(state.playbackId);
   state.playbackId = null;
   elements['timeline-play'].classList.remove('is-playing');
-  elements['timeline-play'].querySelector('span').textContent = '>';
+  timelinePlayIcon.textContent = '>';
   elements['timeline-play'].setAttribute(
     'aria-label',
     'Play the 30-day earthquake timeline'
@@ -714,7 +854,7 @@ function startPlayback() {
   }
   if (state.timelineIndex >= 29) state.timelineIndex = 0;
   elements['timeline-play'].classList.add('is-playing');
-  elements['timeline-play'].querySelector('span').textContent = '||';
+  timelinePlayIcon.textContent = '||';
   elements['timeline-play'].setAttribute(
     'aria-label',
     'Pause the 30-day earthquake timeline'
@@ -762,8 +902,9 @@ function bindControls() {
   );
   elements['close-detail'].addEventListener('click', closeDetail);
   elements['event-list'].addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
     const button = event.target.closest('button[data-event-id]');
-    if (!button) return;
+    if (!(button instanceof HTMLButtonElement)) return;
     selectEvent(
       state.filteredFeatures.find(({ id }) => id === button.dataset.eventId)
     );
@@ -772,14 +913,12 @@ function bindControls() {
     const expanded =
       elements['panel-toggle'].getAttribute('aria-expanded') === 'true';
     elements['panel-toggle'].setAttribute('aria-expanded', String(!expanded));
-    elements['panel-toggle'].querySelector('[aria-hidden]').textContent =
-      expanded ? '+' : '-';
-    elements['panel-toggle'].querySelector('.visually-hidden').textContent =
-      expanded ? 'Expand atlas panel' : 'Collapse atlas panel';
+    panelToggleIcon.textContent = expanded ? '+' : '-';
+    panelToggleLabel.textContent = expanded
+      ? 'Expand atlas panel'
+      : 'Collapse atlas panel';
     elements['atlas-panel-body'].hidden = expanded;
-    document
-      .querySelector('.atlas-panel')
-      .classList.toggle('is-collapsed', expanded);
+    atlasPanel.classList.toggle('is-collapsed', expanded);
   });
   elements['projection-toggle'].addEventListener('click', () => {
     state.isGlobe = !state.isGlobe;
@@ -833,10 +972,8 @@ map.on('load', () => {
 });
 
 map.on('error', (event) => {
-  if (
-    event?.sourceId === 'earthquake-events' ||
-    event?.sourceId === 'earthquake-heat'
-  )
+  const sourceId = /** @type {{sourceId?: string}} */ (event).sourceId;
+  if (sourceId === 'earthquake-events' || sourceId === 'earthquake-heat')
     return;
   setMapMessage(
     'The basemap reported a service error. Data controls remain available.'

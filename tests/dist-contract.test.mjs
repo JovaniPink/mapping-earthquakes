@@ -6,6 +6,10 @@ import test from 'node:test';
 
 const distDirectory = new URL('../dist/', import.meta.url);
 
+/**
+ * @param {string} directory
+ * @returns {Promise<string[]>}
+ */
 async function listFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true });
   const files = await Promise.all(
@@ -98,12 +102,14 @@ test('ships the social preview referenced by the built page', async () => {
   );
 
   assert.equal(socialImages.length, 1);
+  const socialImage = socialImages.at(0);
+  assert.ok(socialImage);
   const builtHtml = await readFile(
     new URL('index.html', distDirectory),
     'utf8'
   );
   const emittedPath = path
-    .relative(fileURLToPath(distDirectory), socialImages[0])
+    .relative(fileURLToPath(distDirectory), socialImage)
     .split(path.sep)
     .join('/');
   assert.ok(

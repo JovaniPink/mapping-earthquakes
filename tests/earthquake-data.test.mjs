@@ -15,6 +15,7 @@ import {
   getMagnitudeColor,
   getRefreshTimelineIndex,
   getTimelineBounds,
+  isFeatureCollection,
   isOfficialUsgsEventUrl,
   normalizeFeature,
   normalizeFeatureCollection,
@@ -24,12 +25,26 @@ import {
   validateFallbackReceipt,
 } from '../static/js/earthquake-data.js';
 
+/** @import {EarthquakeFeature} from '../types/earthquake.d.ts' */
+
 const dataSources = createDataSources(
   new URL('../static/data/PB2002_boundaries.json', import.meta.url),
   new URL('../static/data/significant_month.geojson', import.meta.url),
   new URL('../static/data/significant_month.meta.json', import.meta.url)
 );
 
+/**
+ * @param {Partial<{
+ *   id: string,
+ *   mag: number,
+ *   place: string,
+ *   time: number,
+ *   depth: number,
+ *   sig: number,
+ *   url: string,
+ * }>} [options]
+ * @returns {EarthquakeFeature}
+ */
 function feature({
   id = 'event-1',
   mag = 4.2,
@@ -39,12 +54,14 @@ function feature({
   sig = 100,
   url = 'https://earthquake.usgs.gov/earthquakes/eventpage/us-test',
 } = {}) {
-  return normalizeFeature({
+  const normalized = normalizeFeature({
     type: 'Feature',
     id,
     geometry: { type: 'Point', coordinates: [-117, 35, depth] },
     properties: { mag, place, time, sig, url, status: 'reviewed' },
   });
+  assert.ok(normalized);
+  return normalized;
 }
 
 test('uses the official USGS past-month feed and bundled fallbacks', () => {
@@ -96,6 +113,7 @@ test('pairs the fallback bytes with a complete, internally consistent receipt', 
     receipt
   );
   assert.equal(validatedReceipt.featureCount, snapshot.features.length);
+  assert.equal(validatedReceipt.coverage, receipt.coverage);
   assert.equal(Object.isFrozen(validatedReceipt), true);
   assert.throws(
     () =>
@@ -123,6 +141,9 @@ test('requires every bundled data URL', () => {
 });
 
 test('normalizes valid features and rejects malformed coordinates and values', () => {
+  assert.equal(isFeatureCollection(null), false);
+  assert.equal(isFeatureCollection([]), false);
+  assert.equal(normalizeFeature(null), null);
   assert.equal(feature().properties.depth, 12);
   assert.equal(feature().properties.felt, null);
   assert.equal(
@@ -167,6 +188,7 @@ test('preserves zero while keeping absent optional observations unknown', () => 
     geometry: { type: 'Point', coordinates: [-117, 35, 12] },
     properties: { mag: 2, time: 1, felt: 0, updated: null },
   });
+  assert.ok(normalized);
   assert.equal(normalized.properties.felt, 0);
   assert.equal(normalized.properties.updated, null);
 });
@@ -252,7 +274,9 @@ test('selects strongest deterministically and derives summaries from filtered ev
     feature({ id: 'a', mag: 5, sig: 70, time: 1 }),
     feature({ id: 'c', mag: 4, sig: 900, time: 3 }),
   ];
-  assert.equal(selectStrongest(events).id, 'a');
+  const strongest = selectStrongest(events);
+  assert.ok(strongest);
+  assert.equal(strongest.id, 'a');
   assert.deepEqual(summarizeFeatures(events), {
     count: 3,
     strongestMagnitude: 5,
@@ -294,6 +318,7 @@ test('accepts and normalizes valid GeoJSON FeatureCollections', async () => {
     'https://example.test/feed',
     async () => ({
       ok: true,
+      status: 200,
       json: async () => payload,
     })
   );
@@ -307,6 +332,7 @@ test('rejects HTTP, schema, and timeout failures with useful errors', async () =
     fetchFeatureCollection('https://example.test/feed', async () => ({
       ok: false,
       status: 503,
+      json: async () => null,
     })),
     /HTTP 503/
   );
@@ -331,8 +357,10 @@ test('rejects HTTP, schema, and timeout failures with useful errors', async () =
   await assert.rejects(
     fetchFeatureCollection(
       'https://example.test/feed',
-      (_url, { signal }) =>
+      (_url, init) =>
         new Promise((_resolve, reject) => {
+          const signal = init?.signal;
+          assert.ok(signal);
           signal.addEventListener('abort', () => reject(new Error('aborted')));
         }),
       5

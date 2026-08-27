@@ -1,6 +1,7 @@
 export const ATLAS_TEST_HOST = '127.0.0.1';
 export const DEFAULT_ATLAS_TEST_PORT = 4173;
 
+/** @param {string | null | undefined} [value] */
 export function getAtlasTestPort(value = process.env.ATLAS_TEST_PORT) {
   const port =
     value == null || value === '' ? DEFAULT_ATLAS_TEST_PORT : Number(value);
@@ -10,6 +11,7 @@ export function getAtlasTestPort(value = process.env.ATLAS_TEST_PORT) {
   return port;
 }
 
+/** @param {string | null | undefined} [value] */
 export function getAtlasTestOrigin(value = process.env.ATLAS_TEST_PORT) {
   return `http://${ATLAS_TEST_HOST}:${getAtlasTestPort(value)}`;
 }
