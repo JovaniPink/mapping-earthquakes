@@ -58,7 +58,7 @@
     "@parcel/transformer-raw": "^2.16.4",
     "@parcel/transformer-sass": "^2.16.4",
     "@parcel/transformer-webmanifest": "^2.16.4",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "@types/geojson": "7946.0.16",
     "@types/node": "24.13.3",
     "parcel": "2.16.4",
