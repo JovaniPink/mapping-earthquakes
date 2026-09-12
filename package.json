@@ -63,7 +63,7 @@
     "@types/node": "24.13.3",
     "parcel": "2.16.4",
     "prettier": "3.9.6",
-    "sass": "1.103.1",
+    "sass": "1.104.1",
     "typescript": "7.0.2"
   },
   "engines": {
