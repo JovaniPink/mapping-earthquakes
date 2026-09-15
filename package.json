@@ -51,7 +51,7 @@
   "author": "Jovani Pink",
   "license": "MIT",
   "dependencies": {
-    "maplibre-gl": "6.6.0"
+    "maplibre-gl": "6.10.0"
   },
   "devDependencies": {
     "@parcel/packager-raw-url": "^2.16.4",
