@@ -60,7 +60,7 @@
     "@parcel/transformer-webmanifest": "^2.16.4",
     "@playwright/test": "1.62.1",
     "@types/geojson": "7946.0.16",
-    "@types/node": "24.13.3",
+    "@types/node": "24.19.0",
     "parcel": "2.16.4",
     "prettier": "3.9.6",
     "sass": "1.103.1",
