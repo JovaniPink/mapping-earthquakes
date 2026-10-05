@@ -8,7 +8,7 @@
     "url": "git+https://github.com/JovaniPink/mapping-earthquakes"
   },
   "homepage": "https://github.com/JovaniPink/mapping-earthquakes#readme",
-  "packageManager": "npm@12.0.2+sha224.4c4977784242293bf5a4f80d28aab2d001ba8a7a4532285591a158aa",
+  "packageManager": "npm@12.2.0+sha512.66c2632a94e796649738b2d7894d710c2cc2e1696893823066687f6b0d8a52e5f2b54eeaeaa32ffdc513ecca1e49ff794a5c2ec3f9515d879f1b3182b291cf35",
   "devEngines": {
     "runtime": {
       "name": "node",
@@ -17,7 +17,7 @@
     },
     "packageManager": {
       "name": "npm",
-      "version": "12.0.2",
+      "version": "12.2.0",
       "onFail": "error"
     }
   },
